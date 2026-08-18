@@ -593,14 +593,18 @@ body.eml-media-css .attachments-browser .media-toolbar-secondary {
     row-gap: 0;
 }
 
-/* core pins its own two filters to fixed cells; release them into the flow */
+/*  Core pins its own two filters to fixed cells; release them into the flow.
+    The selects have to be named by id here: core places them with
+    select#media-attachment-filters, and no number of classes outranks an id,
+    so a class-only override silently loses and the selects stay pinned. */
+
 body.eml-media-css .attachments-browser .media-toolbar-secondary > label,
-body.eml-media-css .attachments-browser .media-toolbar-secondary > select {
+body.eml-media-css .attachments-browser .media-toolbar-secondary > select#media-attachment-filters,
+body.eml-media-css .attachments-browser .media-toolbar-secondary > select#media-attachment-date-filters {
     grid-area: auto;
 }
 
 /* not half of a label/control pair, so each takes a whole column */
-body.eml-media-css .attachments-browser .media-toolbar-secondary > .search,
 body.eml-media-css .attachments-browser .media-toolbar-secondary > .view-switch,
 body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-selection,
 body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button,
@@ -626,7 +630,6 @@ body.eml-media-css .attachments-browser .media-toolbar-secondary .search {
         display: block;
     }
 
-    body.eml-media-css .attachments-browser .media-toolbar-secondary > .search,
     body.eml-media-css .attachments-browser .media-toolbar-secondary > .view-switch,
     body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-selection,
     body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button,

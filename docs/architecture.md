@@ -38,16 +38,32 @@ A wrap would have inherited both changes for free.
 
 Measured against WordPress 7.0.4:
 
-- **8 replacements** — the liability
-- **4 wraps** — fine
+- **7 replacements** left — the liability (was 8; `createToolbar` is converted)
+- **5 wraps** — fine
 - **9 added methods** — fine
 - **3 new views** — fine
 
-### The eight to convert
+### The frame runs in its own mode
+
+Worth knowing before touching any of this: on `upload.php` the frame is
+`mode-eml-grid`, not core's `mode-grid`. The mode is set in JavaScript, so grepping the
+PHP for `eml-grid` finds nothing and it is easy to conclude the mode is PRO-only. It is not.
+
+Consequences, all pre-existing and all upstream behaviour:
+
+- core's grid branch in `createToolbar` never runs, so **core's "Bulk select" and "Delete
+  selected" buttons do not exist** on the media grid under this plugin, though they do on
+  stock WordPress
+- the view switcher has to be supplied by us, because core only adds it in its own grid mode
+
+Restoring core's bulk-select is a candidate fix now that the wrap is in place, but it is a
+behaviour change and belongs in its own commit.
+
+### Conversions
 
 | Target | Why it was replaced | Route to a wrap |
 |---|---|---|
-| `AttachmentsBrowser.createToolbar` | to add taxonomy/author filters and to hide core's when disabled | Call core, then `toolbar.set()` ours and `toolbar.unset()` the disabled ones. Core's `Toolbar` exposes `get`/`set`/`unset`. Also restores `filters-heading`. |
+| ~~`AttachmentsBrowser.createToolbar`~~ | **converted.** Calls core, then adds our filters and re-files what core placed differently. Recovered `filters-heading`; verified the toolbar renders at identical coordinates with one extra child, the heading. | done |
 | `AttachmentFilters.change` | reset-button state across several filters | Call core, then update the reset button |
 | `AttachmentFilters.select` | match our extra props | Call core, then correct the selection |
 | `AttachmentsBrowser.updateContent` | no-results messaging in our grid mode | Call core, then adjust; or gate to `eml-grid` only |

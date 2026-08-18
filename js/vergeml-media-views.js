@@ -28,7 +28,11 @@
             l10n = media.view.l10n,
             mediaTrash = media.view.settings.mediaTrash,
             core = {},
-            allFilters = {};
+            // the AttachmentFilters.All instance, once a browser toolbar exists
+            allFilters = null,
+            // the minifier reused one variable for these three unrelated things
+            compatEvents = {},
+            searchEvents = {};
         (_.extend(vergeml.l10n, vergeml_mvln),
             _.defaults(vergeml.l10n, { media_orderby: 'date', media_order: 'DESC' }),
             (core.controllerLibrary = { activate: media.controller.Library.prototype.activate }),
@@ -70,11 +74,11 @@
                 idealColumnWidth:
                     $(window).width() < 640 ? 135 : vergeml.l10n.ideal_column_width || 150,
             }),
-            (allFilters = { 'click input[type=checkbox]': 'preSave' }),
-            _.extend(allFilters, media.view.AttachmentCompat.prototype.events),
+            (compatEvents = { 'click input[type=checkbox]': 'preSave' }),
+            _.extend(compatEvents, media.view.AttachmentCompat.prototype.events),
             (core.AttachmentCompat = { postSave: media.view.AttachmentCompat.prototype.postSave }),
             _.extend(media.view.AttachmentCompat.prototype, {
-                events: allFilters,
+                events: compatEvents,
                 preSave: function () {
                     var t,
                         r = $('input[type=checkbox]', this.$el);
@@ -393,6 +397,7 @@
             }),
             (core.AttachmentsBrowser = {
                 initialize: media.view.AttachmentsBrowser.prototype.initialize,
+                createToolbar: media.view.AttachmentsBrowser.prototype.createToolbar,
                 createSidebar: media.view.AttachmentsBrowser.prototype.createSidebar,
                 createSingle: media.view.AttachmentsBrowser.prototype.createSingle,
                 disposeSingle: media.view.AttachmentsBrowser.prototype.disposeSingle,
@@ -478,274 +483,204 @@
                         )[0].scrollIntoView(t);
                 },
                 createToolbar: function () {
-                    var o,
-                        s,
-                        n,
-                        a = this,
-                        c = 1;
-                    if (
-                        ((n = { controller: this.controller }),
-                        (this.controller.isModeActive('grid') ||
-                            this.controller.isModeActive('eml-grid')) &&
-                            (n.className = 'media-toolbar wp-filter'),
-                        (this.toolbar = new media.view.Toolbar(n)),
-                        this.views.add(this.toolbar),
-                        this.toolbar.set('spinner', new media.view.Spinner({ priority: -40 })),
-                        (this.controller.isModeActive('grid') ||
-                            this.controller.isModeActive('eml-grid')) &&
-                            ((o = media.View.extend({
-                                className: 'view-switch media-grid-view-switch',
-                                template: media.template('media-library-view-switcher'),
-                            })),
-                            this.toolbar.set(
-                                'libraryViewSwitcher',
-                                new o({ controller: this.controller, priority: -90 }).render(),
-                            )),
-                        (-1 !== $.inArray(this.options.filters, ['uploaded', 'all']) ||
-                            (parseInt(vergeml.l10n.force_filters) &&
+                    var browser = this,
+                        order = 1,
+                        show = vergeml.l10n.filters_to_show || [],
+                        isEmlGrid = this.controller.isModeActive('eml-grid'),
+                        frameToolbar,
+                        wantsFilters =
+                            -1 !== $.inArray(this.options.filters, ['uploaded', 'all']) ||
+                            (parseInt(vergeml.l10n.force_filters, 10) &&
                                 !this.controller.isModeActive('eml-bulk-edit') &&
                                 'gallery-edit' !== this.controller._state &&
                                 'playlist-edit' !== this.controller._state &&
                                 'video-playlist-edit' !== this.controller._state) ||
                             'customize' === vergeml.l10n.current_screen ||
-                            'widgets' === vergeml.l10n.current_screen) &&
-                            ((-1 === $.inArray('types', vergeml.l10n.filters_to_show) &&
-                                this.controller.isModeActive('eml-grid')) ||
-                                (this.toolbar.set(
-                                    'filtersLabel',
-                                    new media.view.Label({
-                                        value: l10n.filterByType,
-                                        attributes: { for: 'media-attachment-filters' },
-                                        priority: -80,
-                                    }).render(),
-                                ),
-                                'uploaded' === this.options.filters
-                                    ? this.toolbar.set(
-                                          'filters',
-                                          new media.view.AttachmentFilters.Uploaded({
-                                              controller: this.controller,
-                                              model: this.collection.props,
-                                              priority: -80,
-                                          }).render(),
-                                      )
-                                    : ((s = new media.view.AttachmentFilters.All({
-                                          controller: this.controller,
-                                          model: this.collection.props,
-                                          priority: -80,
-                                      })),
-                                      this.toolbar.set('filters', s.render()))),
-                            -1 !== $.inArray('dates', vergeml.l10n.filters_to_show) &&
-                                media.view.settings.months.length &&
-                                (this.toolbar.set(
-                                    'dateFilterLabel',
-                                    new media.view.Label({
-                                        value: l10n.filterByDate,
-                                        attributes: { for: 'media-attachment-date-filters' },
-                                        priority: -75,
-                                    }).render(),
-                                ),
-                                this.toolbar.set(
-                                    'dateFilter',
-                                    new media.view.DateFilter({
-                                        controller: this.controller,
-                                        model: this.collection.props,
-                                        priority: -75,
-                                    }).render(),
-                                )),
-                            vergeml.l10n.users.length > 1 &&
-                                -1 !== $.inArray('authors', vergeml.l10n.filters_to_show) &&
-                                (this.toolbar.set(
-                                    'authorFilterLabel',
-                                    new media.view.Label({
-                                        value: vergeml.l10n.filter_by + ' ' + vergeml.l10n.author,
-                                        attributes: { for: 'author-filter' },
-                                        priority: c++ - 70,
-                                    }).render(),
-                                ),
-                                this.toolbar.set(
-                                    'author-filter',
-                                    new media.view.AttachmentFilters.Authors({
-                                        controller: this.controller,
-                                        model: this.collection.props,
-                                        priority: c++ - 70,
-                                        users: vergeml.l10n.users,
-                                    }).render(),
-                                )),
-                            -1 !== $.inArray('taxonomies', vergeml.l10n.filters_to_show) &&
-                                $.each(vergeml.l10n.taxonomies, function (e, r) {
-                                    -1 !== _.indexOf(vergeml.l10n.filter_taxonomies, e) &&
-                                        r.term_list.length &&
-                                        (a.toolbar.set(
-                                            e + 'FilterLabel',
-                                            new media.view.Label({
-                                                value: vergeml.l10n.filter_by + ' ' + r.plural_name,
-                                                attributes: {
-                                                    for: 'media-attachment-' + e + '-filters',
-                                                },
-                                                priority: c++ - 70,
-                                            }).render(),
-                                        ),
-                                        a.toolbar.set(
-                                            e + '-filter',
-                                            new media.view.AttachmentFilters.Taxonomy({
-                                                controller: a.controller,
-                                                model: a.collection.props,
-                                                priority: c++ - 70,
-                                                taxonomy: e,
-                                                termList: r.term_list,
-                                                singularName: r.singular_name,
-                                                pluralName: r.plural_name,
-                                            }).render(),
-                                        ));
-                                }),
-                            this.toolbar.$el.find('.attachment-filters').length > 1 &&
-                                this.toolbar.set(
-                                    'resetFilterButton',
-                                    new media.view.Button.resetFilters({
-                                        controller: this.controller,
-                                        text: vergeml.l10n.reset_filters,
-                                        disabled: !0,
-                                        priority: c++ - 70,
-                                    }).render(),
-                                )),
-                        this.controller.isModeActive('eml-grid'))
-                    ) {
-                        var d = this.controller.toolbar.get();
-                        ($('body').hasClass('eml-pro-media-css') &&
-                            d.set(
-                                'emlSelectAllButton',
-                                new media.view.emlSelectAllButton({
-                                    filters: s,
-                                    disabled: !0,
-                                    text: vergeml.l10n.select_all,
-                                    controller: this.controller,
-                                    priority: -80,
-                                }).render(),
-                            ),
-                            d.set(
-                                'emlDeselectButton',
-                                new media.view.emlDeselectButton({
-                                    filters: s,
-                                    disabled: !0,
-                                    text: vergeml.l10n.deselect,
-                                    controller: this.controller,
-                                    priority: -70,
-                                }).render(),
-                            ),
-                            d.set(
-                                'emlDeleteSelectedButton',
-                                new media.view.emlDeleteSelectedButton({
-                                    filters: s,
-                                    style: 'primary',
-                                    disabled: !0,
-                                    text: mediaTrash ? l10n.trashSelected : l10n.deletePermanently,
-                                    controller: this.controller,
-                                    priority: -60,
-                                }).render(),
-                            ),
-                            mediaTrash &&
-                                d.set(
-                                    'emlDeleteSelectedPermanentlyButton',
-                                    new media.view.emlDeleteSelectedPermanentlyButton({
-                                        filters: s,
-                                        style: 'primary',
-                                        disabled: !0,
-                                        text: l10n.deletePermanently,
-                                        controller: this.controller,
-                                        priority: -50,
-                                    }).render(),
-                                ));
+                            'widgets' === vergeml.l10n.current_screen;
+
+                    /*
+                     *  Let core build the toolbar, then adjust what it produced.
+                     *
+                     *  Upstream forked this entire method instead. That is why the
+                     *  WordPress 7.0 grid change broke the layout, and why core's
+                     *  filters-heading was missing: anything core adds after the
+                     *  fork is taken never appears at all. Wrapping means core's
+                     *  additions arrive on their own.
+                     */
+                    core.AttachmentsBrowser.createToolbar.apply(this, arguments);
+
+                    if (!this.toolbar) {
+                        return;
                     }
-                    (this.controller.isModeActive('grid') &&
-                        (this.toolbar.set(
-                            'selectModeToggleButton',
-                            new media.view.SelectModeToggleButton({
-                                text: l10n.bulkSelect,
-                                controller: this.controller,
-                                priority: -70,
-                            }).render(),
-                        ),
-                        this.toolbar.set(
-                            'deleteSelectedButton',
-                            new media.view.DeleteSelectedButton({
-                                filters: s,
-                                style: 'primary',
-                                disabled: !0,
-                                text: mediaTrash ? l10n.trashSelected : l10n.deletePermanently,
-                                controller: this.controller,
-                                priority: -60,
-                                click: function () {
-                                    var i = [],
-                                        o = [],
-                                        s = this.controller.state().get('selection'),
-                                        n = this.controller.state().get('library');
-                                    s.length &&
-                                        (mediaTrash || window.confirm(l10n.warnBulkDelete)) &&
-                                        ((mediaTrash &&
-                                            'trash' !== s.at(0).get('status') &&
-                                            !window.confirm(l10n.warnBulkTrash)) ||
-                                            (s.each(function (e) {
-                                                e.get('nonces').delete
-                                                    ? mediaTrash && 'trash' === e.get('status')
-                                                        ? (e.set('status', 'inherit'),
-                                                          i.push(e.save()),
-                                                          o.push(e))
-                                                        : mediaTrash
-                                                          ? (e.set('status', 'trash'),
-                                                            i.push(e.save()),
-                                                            o.push(e))
-                                                          : e.destroy({ wait: !0 })
-                                                    : o.push(e);
-                                            }),
-                                            i.length
-                                                ? (s.remove(o),
-                                                  $.when.apply(null, i).then(
-                                                      _.bind(function () {
-                                                          (n._requery(!0),
-                                                              this.controller.trigger(
-                                                                  'selection:action:done',
-                                                              ));
-                                                      }, this),
-                                                  ))
-                                                : this.controller.trigger(
-                                                      'selection:action:done',
-                                                  )));
-                                },
-                            }).render(),
-                        ),
-                        mediaTrash &&
+
+                    allFilters = this.toolbar.get('filters');
+
+                    // core only dresses the toolbar for its own grid mode
+                    if (isEmlGrid) {
+                        this.toolbar.$el.addClass('media-toolbar wp-filter');
+
+                        if (!this.toolbar.get('libraryViewSwitcher')) {
                             this.toolbar.set(
-                                'deleteSelectedPermanentlyButton',
-                                new wp.media.view.DeleteSelectedPermanentlyButton({
-                                    filters: s,
-                                    style: 'primary',
-                                    disabled: !0,
-                                    text: l10n.deletePermanently,
-                                    controller: this.controller,
-                                    priority: -55,
-                                    click: function () {
-                                        var e = [],
-                                            t = this.controller.state().get('selection');
-                                        t.length &&
-                                            window.confirm(l10n.warnBulkDelete) &&
-                                            (t.each(function (t) {
-                                                t.get('nonces').delete
-                                                    ? t.destroy({ wait: !0 })
-                                                    : e.push(t);
-                                            }),
-                                            this.controller.trigger('selection:action:done'));
-                                    },
+                                'libraryViewSwitcher',
+                                new (media.View.extend({
+                                    className: 'view-switch media-grid-view-switch',
+                                    template: media.template('media-library-view-switcher'),
+                                }))({ controller: this.controller, priority: -90 }).render(),
+                            );
+                        }
+                    }
+
+                    // ---- filter by type ----
+                    if (!wantsFilters || (isEmlGrid && -1 === $.inArray('types', show))) {
+                        this.toolbar.unset('filtersLabel');
+                        this.toolbar.unset('filters');
+                        allFilters = null;
+                    } else if (!allFilters) {
+                        // force_filters is on somewhere core declined to build them
+                        this.toolbar.set(
+                            'filtersLabel',
+                            new media.view.Label({
+                                value: l10n.filterByType,
+                                attributes: { for: 'media-attachment-filters' },
+                                priority: -80,
+                            }).render(),
+                        );
+                        allFilters =
+                            'uploaded' === this.options.filters
+                                ? new media.view.AttachmentFilters.Uploaded({
+                                      controller: this.controller,
+                                      model: this.collection.props,
+                                      priority: -80,
+                                  })
+                                : new media.view.AttachmentFilters.All({
+                                      controller: this.controller,
+                                      model: this.collection.props,
+                                      priority: -80,
+                                  });
+                        this.toolbar.set('filters', allFilters.render());
+                    }
+
+                    /*
+                     *  ---- filter by date ----
+                     *
+                     *  In grid mode core files the label and the select under the
+                     *  same 'dateFilter' key, so the label is dropped and the date
+                     *  select renders unlabelled. Rebuild the pair, label first, so
+                     *  it reads in order and the two land in the same grid column.
+                     */
+                    this.toolbar.unset('dateFilterLabel');
+                    this.toolbar.unset('dateFilter');
+
+                    if (
+                        wantsFilters &&
+                        -1 !== $.inArray('dates', show) &&
+                        media.view.settings.months.length
+                    ) {
+                        this.toolbar.set(
+                            'dateFilterLabel',
+                            new media.view.Label({
+                                value: l10n.filterByDate,
+                                attributes: { for: 'media-attachment-date-filters' },
+                                priority: -75,
+                            }).render(),
+                        );
+                        this.toolbar.set(
+                            'dateFilter',
+                            new media.view.DateFilter({
+                                controller: this.controller,
+                                model: this.collection.props,
+                                priority: -75,
+                            }).render(),
+                        );
+                    }
+
+                    if (wantsFilters) {
+                        // ---- filter by author ----
+                        if (vergeml.l10n.users.length > 1 && -1 !== $.inArray('authors', show)) {
+                            this.toolbar.set(
+                                'authorFilterLabel',
+                                new media.view.Label({
+                                    value: vergeml.l10n.filter_by + ' ' + vergeml.l10n.author,
+                                    attributes: { for: 'author-filter' },
+                                    priority: order++ - 70,
                                 }).render(),
-                            )),
-                    this.options.search &&
-                        (this.toolbar.set(
+                            );
+                            this.toolbar.set(
+                                'author-filter',
+                                new media.view.AttachmentFilters.Authors({
+                                    controller: this.controller,
+                                    model: this.collection.props,
+                                    priority: order++ - 70,
+                                    users: vergeml.l10n.users,
+                                }).render(),
+                            );
+                        }
+
+                        // ---- one filter per taxonomy assigned to the library ----
+                        if (-1 !== $.inArray('taxonomies', show)) {
+                            $.each(vergeml.l10n.taxonomies, function (taxonomy, data) {
+                                if (
+                                    -1 === _.indexOf(vergeml.l10n.filter_taxonomies, taxonomy) ||
+                                    !data.term_list.length
+                                ) {
+                                    return;
+                                }
+
+                                browser.toolbar.set(
+                                    taxonomy + 'FilterLabel',
+                                    new media.view.Label({
+                                        value: vergeml.l10n.filter_by + ' ' + data.plural_name,
+                                        attributes: {
+                                            for: 'media-attachment-' + taxonomy + '-filters',
+                                        },
+                                        priority: order++ - 70,
+                                    }).render(),
+                                );
+                                browser.toolbar.set(
+                                    taxonomy + '-filter',
+                                    new media.view.AttachmentFilters.Taxonomy({
+                                        controller: browser.controller,
+                                        model: browser.collection.props,
+                                        priority: order++ - 70,
+                                        taxonomy: taxonomy,
+                                        termList: data.term_list,
+                                        singularName: data.singular_name,
+                                        pluralName: data.plural_name,
+                                    }).render(),
+                                );
+                            });
+                        }
+
+                        // ---- reset, once there is more than one filter to reset ----
+                        if (this.toolbar.$el.find('.attachment-filters').length > 1) {
+                            this.toolbar.set(
+                                'resetFilterButton',
+                                new media.view.Button.resetFilters({
+                                    controller: this.controller,
+                                    text: vergeml.l10n.reset_filters,
+                                    disabled: true,
+                                    priority: order++ - 70,
+                                }).render(),
+                            );
+                        }
+                    }
+
+                    /*
+                     *  Core files search under a positive priority, which puts it in
+                     *  the primary toolbar. This plugin keeps it beside the filters
+                     *  in the secondary one, so re-file it with a negative priority.
+                     */
+                    if (this.options.search && this.toolbar.get('search')) {
+                        this.toolbar.unset('searchLabel');
+                        this.toolbar.unset('search');
+                        this.toolbar.set(
                             'searchLabel',
                             new media.view.Label({
                                 value: l10n.searchMediaLabel,
                                 attributes: { for: 'media-search-input' },
                                 priority: -30,
                             }).render(),
-                        ),
+                        );
                         this.toolbar.set(
                             'search',
                             new media.view.Search({
@@ -753,17 +688,66 @@
                                 model: this.collection.props,
                                 priority: -30,
                             }).render(),
-                        )),
-                    this.options.dragInfo &&
-                        this.toolbar.set(
-                            'dragInfo',
-                            new media.View({
-                                el: $('<div class="instructions">' + l10n.dragInfo + '</div>')[0],
-                                priority: -40,
-                            }),
-                        ),
-                    'edit-attachment' !== this.controller._state) &&
-                        ((d = this.controller.toolbar.get()).set(
+                        );
+                    }
+
+                    frameToolbar = this.controller.toolbar && this.controller.toolbar.get();
+
+                    // ---- PRO bulk buttons live on the frame toolbar ----
+                    if (isEmlGrid && frameToolbar) {
+                        if ($('body').hasClass('eml-pro-media-css')) {
+                            frameToolbar.set(
+                                'emlSelectAllButton',
+                                new media.view.emlSelectAllButton({
+                                    filters: allFilters,
+                                    disabled: true,
+                                    text: vergeml.l10n.select_all,
+                                    controller: this.controller,
+                                    priority: -80,
+                                }).render(),
+                            );
+                        }
+
+                        frameToolbar.set(
+                            'emlDeselectButton',
+                            new media.view.emlDeselectButton({
+                                filters: allFilters,
+                                disabled: true,
+                                text: vergeml.l10n.deselect,
+                                controller: this.controller,
+                                priority: -70,
+                            }).render(),
+                        );
+                        frameToolbar.set(
+                            'emlDeleteSelectedButton',
+                            new media.view.emlDeleteSelectedButton({
+                                filters: allFilters,
+                                style: 'primary',
+                                disabled: true,
+                                text: mediaTrash ? l10n.trashSelected : l10n.deletePermanently,
+                                controller: this.controller,
+                                priority: -60,
+                            }).render(),
+                        );
+
+                        if (mediaTrash) {
+                            frameToolbar.set(
+                                'emlDeleteSelectedPermanentlyButton',
+                                new media.view.emlDeleteSelectedPermanentlyButton({
+                                    filters: allFilters,
+                                    style: 'primary',
+                                    disabled: true,
+                                    text: l10n.deletePermanently,
+                                    controller: this.controller,
+                                    priority: -50,
+                                }).render(),
+                            );
+                        }
+                    }
+
+                    // ---- save feedback, also on the frame toolbar ----
+                    if ('edit-attachment' !== this.controller._state && frameToolbar) {
+                        frameToolbar.set(
                             'emlAttachmentSuccess',
                             new media.view.emlAttachmentDetailsEditMessage({
                                 text: vergeml.l10n.saveButton_success,
@@ -771,8 +755,8 @@
                                 controller: this.controller,
                                 priority: 200,
                             }).render(),
-                        ),
-                        d.set(
+                        );
+                        frameToolbar.set(
                             'emlAttachmentError',
                             new media.view.emlAttachmentDetailsEditMessage({
                                 text: vergeml.l10n.saveButton_failure,
@@ -780,7 +764,8 @@
                                 controller: this.controller,
                                 priority: 220,
                             }).render(),
-                        ));
+                        );
+                    }
                 },
                 createSidebar: function () {
                     (core.AttachmentsBrowser.createSidebar.apply(this, arguments),
@@ -891,13 +876,13 @@
                             this.views.add(this.attachmentsNoResults)));
                 },
             }),
-            (allFilters = { input: 'onChange' }),
+            (searchEvents = { input: 'onChange' }),
             _.extend(media.view.Search.prototype, {
                 searchTerm: '',
                 prevTerm: '',
                 searchDelay: 1e3,
                 timer: 0,
-                events: allFilters,
+                events: searchEvents,
                 onChange: function (e) {
                     (clearTimeout(this.timer),
                         (this.searchTerm = e.target.value.trim()),

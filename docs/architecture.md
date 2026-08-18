@@ -81,6 +81,17 @@ instead of between two dropdowns.
 `createToolbar` is the one to do first: it is the largest, it caused the WP 7 break, and it is
 the one dropping `filters-heading`.
 
+## Known issues
+
+- **Duplicate id `eml-save-changes-message`.** `emlAttachmentDetailsEditMessage` hard-codes
+  that id and is instantiated twice, once for the save-success message and once for
+  save-failure. Both stylesheets target it as `#eml-save-changes-message`, and an id
+  selector only matches the first occurrence, so the failure message is likely unstyled.
+  Same class of bug as the author filter's duplicate id. The fix is to move the styling to
+  a class and give the two instances distinct ids; it touches the view plus both
+  stylesheets, so it wants its own commit. Found by the duplicate-id guard below, which is
+  exactly what that guard is for.
+
 ## Guard
 
 Converting is not enough on its own — a wrap can still drift if core renames a toolbar key.

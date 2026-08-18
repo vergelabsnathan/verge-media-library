@@ -4,3 +4,4 @@
 /.wp-env.json     export-ignore
 /.release-assets  export-ignore
 /playground       export-ignore
+/docs             export-ignore

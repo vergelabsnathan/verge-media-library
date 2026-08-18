@@ -556,27 +556,32 @@ body.eml-media-css .media-menu .media-menu-item.hidden {
 
 /* == Media Toolbar :: WordPress 7.0+ == */
 
-/*  WP 7.0 changed .media-toolbar-secondary in wp-includes/css/media-views.css
-    from inline-block flow to a fixed CSS Grid:
+/*  WP 7.0 turned .media-toolbar-secondary into a fixed CSS grid
+    (wp-includes/css/media-views.css:333):
 
         display: grid;
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(2, 1fr);
+        grid-template-columns: repeat( 2, 1fr );
+        grid-template-rows: repeat( 2, 1fr );
 
-    with explicit grid-area placement for the two core filters only. This
-    plugin puts more children in the same container -- author and taxonomy
-    filter pairs, "Reset All Filters", search, bulk buttons, the spinner --
-    and none of them have a grid-area, so they fall into implicit
-    auto-placement and stack onto extra rows below the toolbar.
+    and gave explicit grid-area placement to the two core filters only
+    (media-views.css:345-359). This plugin puts more children in the same
+    container -- author and taxonomy filter pairs, "Reset All Filters",
+    search, bulk buttons -- and none of them have a grid-area, so they fall
+    into implicit auto-placement and stack onto rows below the toolbar.
 
-    Two rows of column flow instead of a fixed 2x2: row 1 holds labels,
-    row 2 holds controls, and any number of pairs lines up the way core's
-    two do. Anything that is not half of a pair takes a full column.
+    Two rows of column flow instead of the fixed 2x2: row 1 holds labels,
+    row 2 holds controls, so any number of filter pairs lines up the way
+    core's two do. Anything that is not half of a pair takes a whole column.
+
+    Scoped through .attachments-browser to outrank core's own
+    .attachments-browser .media-toolbar-secondary (media-views.css:1304),
+    which the shorter selector only ties on specificity. The spinner is
+    left alone: core positions it absolutely, so it is out of grid flow.
 
     Direction-neutral on purpose -- "start" and column-gap follow the
     document direction, so this block is identical in the LTR stylesheet. */
 
-body.eml-media-css .media-toolbar-secondary {
+body.eml-media-css .attachments-browser .media-toolbar-secondary {
     display: grid;
     grid-auto-flow: column;
     grid-template-columns: none;
@@ -586,45 +591,46 @@ body.eml-media-css .media-toolbar-secondary {
     align-items: end;
     column-gap: 12px;
     row-gap: 0;
-    max-width: none;
-    width: auto;
 }
 
 /* core pins its own two filters to fixed cells; release them into the flow */
-body.eml-media-css .media-toolbar-secondary > label,
-body.eml-media-css .media-toolbar-secondary > select {
+body.eml-media-css .attachments-browser .media-toolbar-secondary > label,
+body.eml-media-css .attachments-browser .media-toolbar-secondary > select {
     grid-area: auto;
 }
 
-body.eml-media-css .media-toolbar-secondary > .media-button,
-body.eml-media-css .media-toolbar-secondary > .spinner,
-body.eml-media-css .media-toolbar-secondary > .search,
-body.eml-media-css .media-toolbar-secondary > .view-switch,
-body.eml-media-css .media-toolbar-secondary > .media-selection {
+/* not half of a label/control pair, so each takes a whole column */
+body.eml-media-css .attachments-browser .media-toolbar-secondary > .search,
+body.eml-media-css .attachments-browser .media-toolbar-secondary > .view-switch,
+body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-selection,
+body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button,
+body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button-group {
     grid-row: 1 / -1;
     align-self: end;
 }
 
-/* the pre-7.0 rules above spaced these by hand for inline-block flow */
-body.eml-media-css .media-toolbar-secondary > .media-button,
-body.eml-media-css .media-toolbar-secondary .search {
+/* these were spaced by hand for the pre-7.0 inline-block flow */
+body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button,
+body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button-group,
+body.eml-media-css .attachments-browser .media-toolbar-secondary .search {
     margin-top: 0;
 }
 
-@media screen and (max-width: 782px) {
+/*  Core drops the toolbar to display:block below 900px (media-views.css:2494
+    and :2728). Match that breakpoint, or the grid above outranks it and the
+    desktop layout survives onto small screens. */
 
-    body.eml-media-css .media-toolbar-secondary {
-        grid-auto-flow: row;
-        grid-template-rows: none;
-        grid-auto-columns: auto;
-        row-gap: 8px;
+@media only screen and (max-width: 900px) {
+
+    body.eml-media-css .attachments-browser .media-toolbar-secondary {
+        display: block;
     }
 
-    body.eml-media-css .media-toolbar-secondary > .media-button,
-    body.eml-media-css .media-toolbar-secondary > .spinner,
-    body.eml-media-css .media-toolbar-secondary > .search,
-    body.eml-media-css .media-toolbar-secondary > .view-switch,
-    body.eml-media-css .media-toolbar-secondary > .media-selection {
+    body.eml-media-css .attachments-browser .media-toolbar-secondary > .search,
+    body.eml-media-css .attachments-browser .media-toolbar-secondary > .view-switch,
+    body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-selection,
+    body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button,
+    body.eml-media-css .attachments-browser .media-toolbar-secondary > .media-button-group {
         grid-row: auto;
     }
 }

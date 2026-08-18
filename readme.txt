@@ -4,7 +4,7 @@ Tags: media library, media folders, media tags, media categories, mime types
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.9.5
+Stable tag: 2.9.6
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,17 @@ Please notice that you use Enhanced Media Library with other plugins that add me
 
 
 ## Changelog ##
+
+### 2.9.6 ###
+*Security and isolation pass*
+
+= Security =
+* The AJAX handler that applies settings across a multisite network verified a nonce but no capability. It now requires `manage_network_options`. Not cleanly exploitable before, since the nonce is only printed on a super-admin screen, but the nonce was the only thing standing between a lower-privileged user and network-wide option writes.
+
+= Bugfixes =
+* Script and style handles, CSS classes and DOM ids still carried the upstream `wpuxss-eml-` prefix, which the 2.9.5 rename missed because it only moved the underscore form. The style handle in particular would have collided with Enhanced Media Library and left one plugin's assets unloaded. All moved to `vergeml-`.
+* The three custom AJAX actions were still unprefixed, so both plugins would have answered the same request. Now `vergeml-*`.
+* Admin menu and page titles still read "Enhanced Media Library Utilities" and "EML Utilities".
 
 ### 2.9.5 ###
 *First release of the Verge Media Library fork*

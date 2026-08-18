@@ -26,7 +26,7 @@ window.vergeml = window.vergeml || { l10n: {} };
     });
 
 
-    $( document ).on( 'click', '.eml-apply-settings-to-network', function( event ) {
+    $( document ).on( 'click', '.vergeml-apply-settings-to-network', function( event ) {
 
         var settings =  $( event.target ).attr( 'data-settings' ),
             applying_settings_text;
@@ -56,7 +56,7 @@ window.vergeml = window.vergeml || { l10n: {} };
 
             $.post( ajaxurl, {
                 nonce: vergeml.l10n.apply_to_network_nonce,
-                action: 'eml-apply-settings-to-network',
+                action: 'vergeml-apply-settings-to-network',
                 settings: settings
             },function( response ) {
                 emlFullscreenSpinnerStop();

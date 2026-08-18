@@ -8,15 +8,15 @@ window.vergeml = window.vergeml || { l10n: {} };
 
 
     // create new mime type
-    $( document ).on( 'click', '.wpuxss-eml-button-create-mime', function() {
+    $( document ).on( 'click', '.vergeml-button-create-mime', function() {
 
-        $('.wpuxss-eml-mime-type-list').find('.wpuxss-eml-clone').clone().attr('class','wpuxss-eml-clone-mime').prependTo('.wpuxss-eml-mime-type-list tbody').show(300).find('input').first().focus();
+        $('.vergeml-mime-type-list').find('.vergeml-clone').clone().attr('class','vergeml-clone-mime').prependTo('.vergeml-mime-type-list tbody').show(300).find('input').first().focus();
 
         return false;
     });
 
     // remove mime type
-    $( document ).on( 'click', 'tr .wpuxss-eml-button-remove', function() {
+    $( document ).on( 'click', 'tr .vergeml-button-remove', function() {
 
         $(this).closest('tr').hide( 300, function() {
             $(this).remove();
@@ -26,23 +26,23 @@ window.vergeml = window.vergeml || { l10n: {} };
     });
 
     // on change of an extension during creation
-    $( document ).on( 'blur', '.wpuxss-eml-clone-mime .wpuxss-eml-type', function() {
+    $( document ).on( 'blur', '.vergeml-clone-mime .vergeml-type', function() {
 
         var extension = $(this).val().toLowerCase(),
             mime_type_tr = $(this).closest('tr');
 
         $(this).val(extension);
 
-        mime_type_tr.find('.wpuxss-eml-mime').attr('name','vergeml_mimes['+extension+'][mime]');
-        mime_type_tr.find('.wpuxss-eml-singular').attr('name','vergeml_mimes['+extension+'][singular]');
-        mime_type_tr.find('.wpuxss-eml-plural').attr('name','vergeml_mimes['+extension+'][plural]');
-        mime_type_tr.find('.wpuxss-eml-filter').attr('name','vergeml_mimes['+extension+'][filter]');
-        mime_type_tr.find('.wpuxss-eml-upload').attr('name','vergeml_mimes['+extension+'][upload]');
+        mime_type_tr.find('.vergeml-mime').attr('name','vergeml_mimes['+extension+'][mime]');
+        mime_type_tr.find('.vergeml-singular').attr('name','vergeml_mimes['+extension+'][singular]');
+        mime_type_tr.find('.vergeml-plural').attr('name','vergeml_mimes['+extension+'][plural]');
+        mime_type_tr.find('.vergeml-filter').attr('name','vergeml_mimes['+extension+'][filter]');
+        mime_type_tr.find('.vergeml-upload').attr('name','vergeml_mimes['+extension+'][upload]');
     });
 
 
     // on change of a mime type during creation
-    $( document ).on( 'blur', '.wpuxss-eml-clone-mime .wpuxss-eml-mime', function() {
+    $( document ).on( 'blur', '.vergeml-clone-mime .vergeml-mime', function() {
 
         var mime_type = $(this).val().toLowerCase(),
             mime_type_tr = $(this).closest('tr');
@@ -66,9 +66,9 @@ window.vergeml = window.vergeml || { l10n: {} };
 
             $('<input type="hidden"/>').attr( 'name', name )
                 .val( value )
-                .appendTo( $('#wpuxss-eml-form-mimetypes') );
+                .appendTo( $('#vergeml-form-mimetypes') );
 
-            $('#wpuxss-eml-form-mimetypes').submit();
+            $('#vergeml-form-mimetypes').submit();
 
         })
         .fail(function() {
@@ -77,33 +77,33 @@ window.vergeml = window.vergeml || { l10n: {} };
     });
 
     // on mime types form submit
-    $( '#wpuxss-eml-form-mimetypes' ).on( 'submit', function( event ) {
+    $( '#vergeml-form-mimetypes' ).on( 'submit', function( event ) {
 
         var submit_it = true,
             alert_title = vergeml.l10n.mime_error_cannot_save_title,
             alert_text = '';
 
-        $('.wpuxss-eml-clone-mime').each( function( index ) {
+        $('.vergeml-clone-mime').each( function( index ) {
 
-            if ( $('[id="'+$('.wpuxss-eml-type',this).val()+'"]').length > 0 ||
-                      $('.wpuxss-eml-mime[value="'+$('.wpuxss-eml-mime',this).val()+'"]').length > 0 ) {
+            if ( $('[id="'+$('.vergeml-type',this).val()+'"]').length > 0 ||
+                      $('.vergeml-mime[value="'+$('.vergeml-mime',this).val()+'"]').length > 0 ) {
 
                 submit_it = false;
                 alert_text = '<p>' + vergeml.l10n.mime_error_duplicate + '</p>';
             }
-            else if ( ! $('.wpuxss-eml-type',this).val() || $('.wpuxss-eml-type',this).val() == '' ||
-                 ! $('.wpuxss-eml-mime',this).val() || $('.wpuxss-eml-mime',this).val() == '' ) {
+            else if ( ! $('.vergeml-type',this).val() || $('.vergeml-type',this).val() == '' ||
+                 ! $('.vergeml-mime',this).val() || $('.vergeml-mime',this).val() == '' ) {
 
                 submit_it = false;
                 alert_text = '<p>' + vergeml.l10n.mime_error_empty_fields + '</p>';
             }
 
 
-            if ( ! $('.wpuxss-eml-singular',this).val() || $('.wpuxss-eml-singular',this).val() == '' ||
-                 ! $('.wpuxss-eml-plural',this).val() || $('.wpuxss-eml-plural',this).val() == '' ) {
+            if ( ! $('.vergeml-singular',this).val() || $('.vergeml-singular',this).val() == '' ||
+                 ! $('.vergeml-plural',this).val() || $('.vergeml-plural',this).val() == '' ) {
 
-                $('.wpuxss-eml-singular',this).val($('.wpuxss-eml-mime',this).val());
-                $('.wpuxss-eml-plural',this).val($('.wpuxss-eml-mime',this).val());
+                $('.vergeml-singular',this).val($('.vergeml-mime',this).val());
+                $('.vergeml-plural',this).val($('.vergeml-mime',this).val());
             }
         });
 

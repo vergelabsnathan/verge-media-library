@@ -115,7 +115,7 @@ window.vergeml = window.vergeml || { l10n: {} };
 
         $.post( ajaxurl, {
             nonce:     vergeml.l10n.admin_notice_nonce,
-            action:    'eml-admin-notice-dismiss',
+            action:    'vergeml-admin-notice-dismiss',
             notice_id: notice_id
         });        
     });

@@ -404,23 +404,23 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
 
         // admin styles
         wp_enqueue_style(
-            'wpuxss-eml-admin-custom-style',
+            'vergeml-admin-custom-style',
             $vergeml_dir . 'css/eml-admin.css',
             false,
             VERGEML_VERSION,
             'all'
         );
-        wp_style_add_data( 'wpuxss-eml-admin-custom-style', 'rtl', 'replace' );
+        wp_style_add_data( 'vergeml-admin-custom-style', 'rtl', 'replace' );
 
         // media styles
         wp_enqueue_style(
-            'wpuxss-eml-admin-media-style',
+            'vergeml-admin-media-style',
             $vergeml_dir . 'css/eml-admin-media.css',
             false,
             VERGEML_VERSION,
             'all'
         );
-        wp_style_add_data( 'wpuxss-eml-admin-media-style', 'rtl', 'replace' );
+        wp_style_add_data( 'vergeml-admin-media-style', 'rtl', 'replace' );
 
 
         wp_enqueue_style ( 'wp-jquery-ui-dialog' );
@@ -428,7 +428,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
 
         // admin scripts
         wp_enqueue_script(
-            'wpuxss-eml-admin-script',
+            'vergeml-admin-script',
             $vergeml_dir . 'js/eml-admin.js',
             array( 'jquery', 'jquery-ui-dialog', 'underscore' ),
             VERGEML_VERSION,
@@ -440,7 +440,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         );
 
         wp_localize_script(
-            'wpuxss-eml-admin-script',
+            'vergeml-admin-script',
             'vergeml_admin_l10n',
             $admin_l10n
         );
@@ -450,7 +450,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         if ( isset( $current_screen ) && 'upload' === $current_screen->base && 'list' === $media_library_mode ) {
 
             wp_enqueue_script(
-                'wpuxss-eml-media-list-script',
+                'vergeml-media-list-script',
                 $vergeml_dir . 'js/eml-media-list.js',
                 array('jquery'),
                 VERGEML_VERSION,
@@ -469,7 +469,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             );
 
             wp_localize_script(
-                'wpuxss-eml-media-list-script',
+                'vergeml-media-list-script',
                 'vergeml_media_list_l10n',
                 $media_list_l10n
             );
@@ -505,7 +505,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         $rpath  = defined( 'EML_SCRIPT_DEBUG' ) ? 'js/source/' : 'js/';
 
         wp_register_script(
-            'wpuxss-eml-media-views-script',
+            'vergeml-media-views-script',
             $vergeml_dir . $rpath . 'eml-media-views' . $suffix . '.js',
             array('media-views'),
             VERGEML_VERSION,
@@ -513,9 +513,9 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         );
 
         wp_register_script(
-            'wpuxss-eml-taxonomies-options-script',
+            'vergeml-taxonomies-options-script',
             $vergeml_dir . $rpath . 'eml-taxonomies-options' . $suffix . '.js',
-            array( 'jquery', 'underscore', 'wpuxss-eml-admin-script' ),
+            array( 'jquery', 'underscore', 'vergeml-admin-script' ),
             VERGEML_VERSION,
             true
         );
@@ -619,19 +619,19 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         // generic scripts
 
         wp_enqueue_script(
-            'wpuxss-eml-media-models-script',
+            'vergeml-media-models-script',
             $vergeml_dir . 'js/eml-media-models.js',
             array('media-models'),
             VERGEML_VERSION,
             true
         );
 
-        wp_enqueue_script( 'wpuxss-eml-media-views-script' );
+        wp_enqueue_script( 'vergeml-media-views-script' );
 
 
         // TODO:
         // wp_enqueue_script(
-        //     'wpuxss-eml-tags-box-script',
+        //     'vergeml-tags-box-script',
         //     '/wp-admin/js/tags-box.js',
         //     array(),
         //     VERGEML_VERSION,
@@ -648,7 +648,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         );
 
         wp_localize_script(
-            'wpuxss-eml-media-models-script',
+            'vergeml-media-models-script',
             'vergeml_media_models_l10n',
             $media_models_l10n
         );
@@ -689,7 +689,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         );
 
         wp_localize_script(
-            'wpuxss-eml-media-views-script',
+            'vergeml-media-views-script',
             'vergeml_mvln',
             $media_views_l10n
         );
@@ -698,7 +698,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         if ( vergeml_enhance_media_shortcodes() ) {
 
             wp_enqueue_script(
-                'wpuxss-eml-enhanced-medialist-script',
+                'vergeml-enhanced-medialist-script',
                 $vergeml_dir . 'js/eml-enhanced-medialist.js',
                 array('media-views'),
                 VERGEML_VERSION,
@@ -706,9 +706,9 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             );
 
             wp_enqueue_script(
-                'wpuxss-eml-media-editor-script',
+                'vergeml-media-editor-script',
                 $vergeml_dir . 'js/eml-media-editor.js',
-                array('media-editor','media-views', 'wpuxss-eml-enhanced-medialist-script'),
+                array('media-editor','media-views', 'vergeml-enhanced-medialist-script'),
                 VERGEML_VERSION,
                 true
             );
@@ -719,7 +719,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             );
 
             wp_localize_script(
-                'wpuxss-eml-enhanced-medialist-script',
+                'vergeml-enhanced-medialist-script',
                 'vergeml_enhanced_medialist_l10n',
                 $enhanced_medialist_l10n
             );
@@ -730,7 +730,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         if ( isset( $current_screen ) && 'upload' === $current_screen->base && 'grid' === $media_library_mode ) {
 
             wp_enqueue_script(
-                'wpuxss-eml-media-grid-script',
+                'vergeml-media-grid-script',
                 $vergeml_dir . 'js/eml-media-grid.js',
                 array( 'media-grid'),
                 VERGEML_VERSION,
@@ -738,7 +738,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             );
 
             wp_enqueue_script(
-                'wpuxss-eml-media-script',
+                'vergeml-media-script',
                 $vergeml_dir . 'js/eml-media.js',
                 array( 'media-grid' ),
                 VERGEML_VERSION,
@@ -754,7 +754,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             );
 
             wp_localize_script(
-                'wpuxss-eml-media-grid-script',
+                'vergeml-media-grid-script',
                 'vergeml_media_grid_l10n',
                 $media_grid_l10n
             );

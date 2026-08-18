@@ -501,12 +501,16 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         global $vergeml_dir;
 
 
-        $suffix = defined( 'EML_SCRIPT_DEBUG' ) ? '' : '.min';
-        $rpath  = defined( 'EML_SCRIPT_DEBUG' ) ? 'js/source/' : 'js/';
+        /*
+         *  Upstream shipped these two as minified-only and switched on an
+         *  EML_SCRIPT_DEBUG constant to load js/source/, a directory that was
+         *  never in the distribution. There was no readable copy of either
+         *  file. They are now plain source, so there is nothing to switch.
+         */
 
         wp_register_script(
             'vergeml-media-views-script',
-            $vergeml_dir . $rpath . 'eml-media-views' . $suffix . '.js',
+            $vergeml_dir . 'js/vergeml-media-views.js',
             array('media-views'),
             VERGEML_VERSION,
             true
@@ -514,7 +518,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
 
         wp_register_script(
             'vergeml-taxonomies-options-script',
-            $vergeml_dir . $rpath . 'eml-taxonomies-options' . $suffix . '.js',
+            $vergeml_dir . 'js/vergeml-taxonomies-options.js',
             array( 'jquery', 'underscore', 'vergeml-admin-script' ),
             VERGEML_VERSION,
             true

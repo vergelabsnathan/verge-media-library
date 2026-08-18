@@ -4,7 +4,7 @@ Tags: media library, media folders, media tags, media categories, mime types
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.9.6
+Stable tag: 2.9.7
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -192,6 +192,21 @@ Please notice that you use Enhanced Media Library with other plugins that add me
 
 
 ## Changelog ##
+
+### 2.9.7 ###
+*Feature restored, and the media view code made maintainable*
+
+= Restored =
+* **Bulk select** and **Delete selected** are back on the media library grid. Stock WordPress has them; this plugin has been shipping without them because its media grid runs as a custom frame that WordPress does not recognise as the grid, so core never built them. Selecting items and deleting or trashing them in bulk works again, using WordPress's own handling.
+* Pressing Escape now leaves bulk select. The frame's reference to the page body had been commented out while the key handler still used it, so entering bulk select threw a JavaScript error — invisible until now only because bulk select could not be entered.
+
+= Fixed =
+* The media toolbar now renders WordPress's `filters-heading`, the hidden heading that tells screen reader users what the filter row is. It was lost because the plugin replaced WordPress's toolbar code wholesale rather than extending it, so anything core added afterwards never appeared.
+* Filters are ordered so the Bulk select button sits after the filter row rather than between two dropdowns.
+
+= Under the hood =
+* `eml-media-views.min.js` and `eml-taxonomies-options.min.js` shipped minified with no readable source, and the constant that was supposed to load a readable copy pointed at a directory that was never in the distribution. Both are now plain, readable source. No behaviour changed in the recovery.
+* The plugin's toolbar code now extends WordPress's instead of replacing it. This is the change that stops the WordPress 7.0 breakage from recurring: fixes and additions in WordPress arrive on their own instead of needing to be copied in.
 
 ### 2.9.6 ###
 *Security and isolation pass*

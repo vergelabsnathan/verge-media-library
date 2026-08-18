@@ -3,7 +3,7 @@
 Plugin Name: Verge Media Library
 Plugin URI: https://github.com/vergelabsnathan/verge-media-library
 Description: Categories, tags and custom taxonomies for the media library, MIME type management, and configurable media grid filters.
-Version: 2.9.6
+Version: 2.9.7
 Requires at least: 6.5
 Requires PHP: 7.4
 Author: VergeLabs
@@ -32,7 +32,7 @@ if ( ! defined( 'ABSPATH' ) )
 
 
 
-if ( ! defined('VERGEML_VERSION') ) define( 'VERGEML_VERSION', '2.9.6' );
+if ( ! defined('VERGEML_VERSION') ) define( 'VERGEML_VERSION', '2.9.7' );
 
 
 

@@ -1,16 +1,28 @@
 <?php
 /*
-Plugin Name: Enhanced Media Library
-Plugin URI: https://wpUXsolutions.com/plugins/enhanced-media-library
-Description: This plugin will be handy for those who need to manage a lot of media files.
-Version: 2.9.4
-Author: wpUXsolutions
-Author URI: http://wpUXsolutions.com
-Text Domain: enhanced-media-library
+Plugin Name: Verge Media Library
+Plugin URI: https://github.com/vergelabsnathan/verge-media-library
+Description: Categories, tags and custom taxonomies for the media library, MIME type management, and configurable media grid filters.
+Version: 2.9.5
+Requires at least: 6.5
+Requires PHP: 7.4
+Author: VergeLabs
+Author URI: https://github.com/vergelabsnathan
+Text Domain: verge-media-library
 Domain Path: /languages
-License: GPL version 2 or later - http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
+License: GPLv2 or later
+License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
 
-Copyright 2013-2024 wpUXsolutions  (email : wpUXsolutions@gmail.com)
+Based on Enhanced Media Library by wpUXsolutions.
+https://wordpress.org/plugins/enhanced-media-library/
+
+Copyright 2013-2024 wpUXsolutions  (original work)
+Copyright 2026 VergeLabs  (modifications)
+
+This program is free software; you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation; either version 2 of the License, or (at your option) any later
+version.
 */
 
 
@@ -20,22 +32,22 @@ if ( ! defined( 'ABSPATH' ) )
 
 
 
-if ( ! defined('EML_VERSION') ) define( 'EML_VERSION', '2.9.4' );
+if ( ! defined('VERGEML_VERSION') ) define( 'VERGEML_VERSION', '2.9.5' );
 
 
 
-global $wpuxss_eml_dir,
-       $wpuxss_eml_slug,
-       $wpuxss_eml_filename,
-       $wpuxss_eml_basename;
+global $vergeml_dir,
+       $vergeml_slug,
+       $vergeml_filename,
+       $vergeml_basename;
 
 
 
-if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
+if ( ! function_exists( 'vergeml_get_slug' ) ) {
 
 
     /**
-     *  wpuxss_get_eml_slug
+     *  vergeml_get_slug
      *
      *  keeping the name for older versions compatibility
      * 
@@ -44,7 +56,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
      *  @created  27/10/15
      */
 
-    function wpuxss_get_eml_slug() {
+    function vergeml_get_slug() {
 
         $path_array = explode( '/', dirname( __FILE__ ) );
         $slug = end( $path_array );
@@ -55,34 +67,34 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_get_eml_basename
+     *  vergeml_get_basename
      *
      *  @since    2.1
      *  @since    2.8.16 modified
      *  @created  27/10/15
      */
 
-    function wpuxss_get_eml_basename() {
+    function vergeml_get_basename() {
 
-        global $wpuxss_eml_basename;
+        global $vergeml_basename;
 
-        return $wpuxss_eml_basename;
+        return $vergeml_basename;
     }
 
 
 
     /**
-     *  wpuxss_eml_enhance_media_shortcodes
+     *  vergeml_enhance_media_shortcodes
      *
      *  @since    2.1.4
      *  @created  08/01/16
      */
 
-    function wpuxss_eml_enhance_media_shortcodes() {
+    function vergeml_enhance_media_shortcodes() {
 
-        $wpuxss_eml_lib_options = get_option( 'wpuxss_eml_lib_options', array() );
+        $vergeml_lib_options = get_option( 'vergeml_lib_options', array() );
 
-        $enhance_media_shortcodes = isset( $wpuxss_eml_lib_options['enhance_media_shortcodes'] ) ? (bool) $wpuxss_eml_lib_options['enhance_media_shortcodes'] : false;
+        $enhance_media_shortcodes = isset( $vergeml_lib_options['enhance_media_shortcodes'] ) ? (bool) $vergeml_lib_options['enhance_media_shortcodes'] : false;
 
         return $enhance_media_shortcodes;
     }
@@ -90,17 +102,17 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_eml_enable_infinite_scrolling
+     *  vergeml_enable_infinite_scrolling
      *
      *  @since    2.9
      *  @created  09/2021
      */
 
-    function wpuxss_eml_enable_infinite_scrolling() {
+    function vergeml_enable_infinite_scrolling() {
 
-        $wpuxss_eml_lib_options = get_option( 'wpuxss_eml_lib_options', array() );
+        $vergeml_lib_options = get_option( 'vergeml_lib_options', array() );
 
-        $enable_infinite_scrolling = isset( $wpuxss_eml_lib_options['infinite_scrolling'] ) ? (bool) $wpuxss_eml_lib_options['infinite_scrolling'] : false;
+        $enable_infinite_scrolling = isset( $vergeml_lib_options['infinite_scrolling'] ) ? (bool) $vergeml_lib_options['infinite_scrolling'] : false;
 
         return $enable_infinite_scrolling;
     }
@@ -108,105 +120,153 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_eml_on_activation
+     *  vergeml_on_activation
      *
      *  @since    2.7
      *  @created  31/08/18
      */
 
-    register_activation_hook( __FILE__, 'wpuxss_eml_on_activation' );
+    register_activation_hook( __FILE__, 'vergeml_on_activation' );
 
-    function wpuxss_eml_on_activation() {
+    function vergeml_on_activation() {
+
+        // carry settings over from Enhanced Media Library, if it left any
+        vergeml_migrate_legacy_options();
 
         // per site
         // main site if multisite
-        wpuxss_eml_set_options();
+        vergeml_set_options();
 
 
         if ( is_multisite() && is_network_admin() ) {
 
             // network options
-            wpuxss_eml_set_network_options();
+            vergeml_set_network_options();
 
             // common (site) options
-            do_action( 'wpuxss_eml_set_site_options' );
+            do_action( 'vergeml_set_site_options' );
         }
     }
 
 
 
     /**
-     *  wpuxss_eml_on_plugins_loaded
+     *  vergeml_migrate_legacy_options
+     *
+     *  Carries settings over from Enhanced Media Library, whose option names
+     *  this plugin used before the fork was renamed. Copies a value only when
+     *  this plugin has none of its own yet, and never removes the originals,
+     *  so Enhanced Media Library still works if someone switches back.
+     *
+     *  @since    2.9.5
+     */
+
+    function vergeml_migrate_legacy_options() {
+
+        $legacy = array(
+            'wpuxss_eml_version'     => 'vergeml_version',
+            'wpuxss_eml_lib_options' => 'vergeml_lib_options',
+            'wpuxss_eml_taxonomies'  => 'vergeml_taxonomies',
+            'wpuxss_eml_tax_options' => 'vergeml_tax_options',
+            'wpuxss_eml_mimes'       => 'vergeml_mimes',
+            'wpuxss_eml_backup'      => 'vergeml_backup'
+        );
+
+        foreach ( $legacy as $old_name => $new_name ) {
+
+            if ( false !== get_option( $new_name, false ) )
+                continue;
+
+            $value = get_option( $old_name, false );
+
+            if ( false !== $value )
+                update_option( $new_name, $value );
+        }
+
+
+        if ( is_multisite() && false === get_site_option( 'vergeml_network_options', false ) ) {
+
+            $network_options = get_site_option( 'wpuxss_eml_network_options', false );
+
+            if ( false !== $network_options )
+                update_site_option( 'vergeml_network_options', $network_options );
+        }
+    }
+
+
+
+    /**
+     *  vergeml_on_plugins_loaded
      *
      *  @since    2.6.1
      *  @since    2.9 modified
      *  @created  20/05/18
      */
 
-    add_action( 'plugins_loaded', 'wpuxss_eml_on_plugins_loaded' );
+    add_action( 'plugins_loaded', 'vergeml_on_plugins_loaded' );
 
-    function wpuxss_eml_on_plugins_loaded() {
+    function vergeml_on_plugins_loaded() {
 
-        global $wpuxss_eml_dir,
-               $wpuxss_eml_slug,
-               $wpuxss_eml_filename,
-               $wpuxss_eml_basename;
+        global $vergeml_dir,
+               $vergeml_slug,
+               $vergeml_filename,
+               $vergeml_basename;
 
 
-        $wpuxss_eml_dir      = plugin_dir_url( __FILE__ );
-        $wpuxss_eml_slug     = wpuxss_get_eml_slug();
-        $wpuxss_eml_filename = basename( __FILE__ );
-        $wpuxss_eml_basename = $wpuxss_eml_slug . '/' . $wpuxss_eml_filename;
+        $vergeml_dir      = plugin_dir_url( __FILE__ );
+        $vergeml_slug     = vergeml_get_slug();
+        $vergeml_filename = basename( __FILE__ );
+        $vergeml_basename = $vergeml_slug . '/' . $vergeml_filename;
 
 
         // on update
-        if ( EML_VERSION !== get_option( 'wpuxss_eml_version', '' ) ) {
-            wpuxss_eml_on_activation();
-            update_option( 'wpuxss_eml_version', EML_VERSION );
+        if ( VERGEML_VERSION !== get_option( 'vergeml_version', '' ) ) {
+            vergeml_on_activation();
+            update_option( 'vergeml_version', VERGEML_VERSION );
             delete_site_transient( 'eml_transient' );
         }
 
 
         // plugin action links
         add_filter( 
-            'plugin_action_links_' . wpuxss_get_eml_basename(),
-            'wpuxss_eml_settings_link', 10, 4 
+            'plugin_action_links_' . vergeml_get_basename(),
+            'vergeml_settings_link', 10, 4 
         );
         add_filter( 
-            'network_admin_plugin_action_links_' . wpuxss_get_eml_basename(),
-            'wpuxss_eml_settings_link', 10, 4 
+            'network_admin_plugin_action_links_' . vergeml_get_basename(),
+            'vergeml_settings_link', 10, 4 
         );
 
-        add_filter( 'plugin_row_meta', 'wpuxss_eml_plugin_row_meta', 10, 4 );
+        add_filter( 'plugin_row_meta', 'vergeml_plugin_row_meta', 10, 4 );
     }
 
 
 
     /**
-     *  wpuxss_eml_on_init
+     *  vergeml_on_init
      *
      *  @since    1.0
      *  @created  03/08/13
      */
 
-    add_action( 'init', 'wpuxss_eml_on_init', 12 );
+    add_action( 'init', 'vergeml_on_init', 12 );
 
-    function wpuxss_eml_on_init() {
+    function vergeml_on_init() {
 
-        $wpuxss_eml_taxonomies = get_option( 'wpuxss_eml_taxonomies', array() );
-        $wpuxss_eml_tax_options = get_option( 'wpuxss_eml_tax_options', array() );
+        $vergeml_taxonomies = get_option( 'vergeml_taxonomies', array() );
+        $vergeml_tax_options = get_option( 'vergeml_tax_options', array() );
 
         // register eml taxonomies
-        foreach ( (array) $wpuxss_eml_taxonomies as $taxonomy => $params ) {
+        foreach ( (array) $vergeml_taxonomies as $taxonomy => $params ) {
 
             if ( $params['eml_media'] && ! empty( $params['labels']['singular_name'] ) && ! empty( $params['labels']['name'] ) ) {
 
                 $labels = array_map( 'sanitize_text_field', $params['labels'] );
 
-                if ( (bool) $wpuxss_eml_tax_options['tax_archives'] ) {
+                if ( (bool) $vergeml_tax_options['tax_archives'] ) {
 
                     $rewrite = array(
-                        'slug' => wpuxss_eml_sanitize_slug( $params['rewrite']['slug'], $taxonomy ),
+                        'slug' => vergeml_sanitize_slug( $params['rewrite']['slug'], $taxonomy ),
                         'with_front' => (bool) $params['rewrite']['with_front']
                     );
                     $public = true;
@@ -238,25 +298,25 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_eml_on_wp_loaded
+     *  vergeml_on_wp_loaded
      *
      *  @since    1.0
      *  @created  03/11/13
      */
 
-    add_action( 'wp_loaded', 'wpuxss_eml_on_wp_loaded' );
+    add_action( 'wp_loaded', 'vergeml_on_wp_loaded' );
 
-    function wpuxss_eml_on_wp_loaded() {
+    function vergeml_on_wp_loaded() {
 
         global $wp_taxonomies;
 
-        $wpuxss_eml_taxonomies = get_option( 'wpuxss_eml_taxonomies', array() );
+        $vergeml_taxonomies = get_option( 'vergeml_taxonomies', array() );
         $taxonomies = get_taxonomies( array(), 'object' );
 
         // discover 'foreign' taxonomies
         foreach ( $taxonomies as $taxonomy => $params ) {
 
-            if ( ! empty( $params->object_type ) && ! array_key_exists( $taxonomy, $wpuxss_eml_taxonomies ) &&
+            if ( ! empty( $params->object_type ) && ! array_key_exists( $taxonomy, $vergeml_taxonomies ) &&
                  ! in_array( 'revision', $params->object_type ) &&
                  ! in_array( 'nav_menu_item', $params->object_type ) &&
                  $taxonomy !== 'wp_theme' &&
@@ -265,7 +325,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
                  $taxonomy !== 'wp_pattern_category' &&
                  $taxonomy !== 'wp_template_part_area' ) {
 
-                $wpuxss_eml_taxonomies[$taxonomy] = array(
+                $vergeml_taxonomies[$taxonomy] = array(
                     'eml_media' => 0,
                     'admin_filter' => 1, // since 2.7
                     'media_uploader_filter' => 1, // since 2.7
@@ -274,14 +334,14 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
                 );
 
                 if ( in_array('attachment',$params->object_type) )
-                    $wpuxss_eml_taxonomies[$taxonomy]['assigned'] = 1;
+                    $vergeml_taxonomies[$taxonomy]['assigned'] = 1;
                 else
-                    $wpuxss_eml_taxonomies[$taxonomy]['assigned'] = 0;
+                    $vergeml_taxonomies[$taxonomy]['assigned'] = 0;
             }
         }
 
         // assign/unassign taxonomies to atachment
-        foreach ( $wpuxss_eml_taxonomies as $taxonomy => $params ) {
+        foreach ( $vergeml_taxonomies as $taxonomy => $params ) {
 
             $taxonomy = sanitize_key($taxonomy);
 
@@ -317,37 +377,37 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
             }
         }
 
-        update_option( 'wpuxss_eml_taxonomies', $wpuxss_eml_taxonomies );
+        update_option( 'vergeml_taxonomies', $vergeml_taxonomies );
     }
 
 
 
     /**
-     *  wpuxss_eml_admin_enqueue_scripts
+     *  vergeml_admin_enqueue_scripts
      *
      *  @since    1.1.1
      *  @created  07/04/14
      */
 
-    add_action( 'admin_enqueue_scripts', 'wpuxss_eml_admin_enqueue_scripts' );
+    add_action( 'admin_enqueue_scripts', 'vergeml_admin_enqueue_scripts' );
 
-    function wpuxss_eml_admin_enqueue_scripts() {
+    function vergeml_admin_enqueue_scripts() {
 
-        global $wpuxss_eml_dir,
+        global $vergeml_dir,
                $current_screen;
 
 
         $media_library_mode = get_user_option( 'media_library_mode', get_current_user_id() ) ? get_user_option( 'media_library_mode', get_current_user_id() ) : 'grid';
 
-        $wpuxss_eml_lib_options = get_option( 'wpuxss_eml_lib_options' );
+        $vergeml_lib_options = get_option( 'vergeml_lib_options' );
 
 
         // admin styles
         wp_enqueue_style(
             'wpuxss-eml-admin-custom-style',
-            $wpuxss_eml_dir . 'css/eml-admin.css',
+            $vergeml_dir . 'css/eml-admin.css',
             false,
-            EML_VERSION,
+            VERGEML_VERSION,
             'all'
         );
         wp_style_add_data( 'wpuxss-eml-admin-custom-style', 'rtl', 'replace' );
@@ -355,9 +415,9 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
         // media styles
         wp_enqueue_style(
             'wpuxss-eml-admin-media-style',
-            $wpuxss_eml_dir . 'css/eml-admin-media.css',
+            $vergeml_dir . 'css/eml-admin-media.css',
             false,
-            EML_VERSION,
+            VERGEML_VERSION,
             'all'
         );
         wp_style_add_data( 'wpuxss-eml-admin-media-style', 'rtl', 'replace' );
@@ -369,9 +429,9 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
         // admin scripts
         wp_enqueue_script(
             'wpuxss-eml-admin-script',
-            $wpuxss_eml_dir . 'js/eml-admin.js',
+            $vergeml_dir . 'js/eml-admin.js',
             array( 'jquery', 'jquery-ui-dialog', 'underscore' ),
-            EML_VERSION,
+            VERGEML_VERSION,
             true
         );
 
@@ -381,7 +441,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
         wp_localize_script(
             'wpuxss-eml-admin-script',
-            'wpuxss_eml_admin_l10n',
+            'vergeml_admin_l10n',
             $admin_l10n
         );
 
@@ -391,17 +451,17 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
             wp_enqueue_script(
                 'wpuxss-eml-media-list-script',
-                $wpuxss_eml_dir . 'js/eml-media-list.js',
+                $vergeml_dir . 'js/eml-media-list.js',
                 array('jquery'),
-                EML_VERSION,
+                VERGEML_VERSION,
                 true
             );
 
             $media_list_l10n = array(
                 '$_GET'             => wp_json_encode($_GET),
-                'uncategorized'     => __( 'All Uncategorized', 'enhanced-media-library' ),
-                'reset_all_filters' => __( 'Reset All Filters', 'enhanced-media-library' ),
-                'filters_to_show'   => $wpuxss_eml_lib_options ? array_map( 'sanitize_key', $wpuxss_eml_lib_options['filters_to_show'] ) : array(
+                'uncategorized'     => __( 'All Uncategorized', 'verge-media-library' ),
+                'reset_all_filters' => __( 'Reset All Filters', 'verge-media-library' ),
+                'filters_to_show'   => $vergeml_lib_options ? array_map( 'sanitize_key', $vergeml_lib_options['filters_to_show'] ) : array(
                     'types',
                     'dates',
                     'taxonomies'
@@ -410,7 +470,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
             wp_localize_script(
                 'wpuxss-eml-media-list-script',
-                'wpuxss_eml_media_list_l10n',
+                'vergeml_media_list_l10n',
                 $media_list_l10n
             );
         }
@@ -426,7 +486,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_eml_register_scripts
+     *  vergeml_register_scripts
      * 
      *  @todo :: make a separate one for Elementor if need be
      *
@@ -434,11 +494,11 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
      *  @created  2024/05
      */
 
-    add_action( 'wp_loaded', 'wpuxss_eml_register_scripts' );
+    add_action( 'wp_loaded', 'vergeml_register_scripts' );
 
-    function wpuxss_eml_register_scripts() {
+    function vergeml_register_scripts() {
 
-        global $wpuxss_eml_dir;
+        global $vergeml_dir;
 
 
         $suffix = defined( 'EML_SCRIPT_DEBUG' ) ? '' : '.min';
@@ -446,17 +506,17 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
         wp_register_script(
             'wpuxss-eml-media-views-script',
-            $wpuxss_eml_dir . $rpath . 'eml-media-views' . $suffix . '.js',
+            $vergeml_dir . $rpath . 'eml-media-views' . $suffix . '.js',
             array('media-views'),
-            EML_VERSION,
+            VERGEML_VERSION,
             true
         );
 
         wp_register_script(
             'wpuxss-eml-taxonomies-options-script',
-            $wpuxss_eml_dir . $rpath . 'eml-taxonomies-options' . $suffix . '.js',
+            $vergeml_dir . $rpath . 'eml-taxonomies-options' . $suffix . '.js',
             array( 'jquery', 'underscore', 'wpuxss-eml-admin-script' ),
-            EML_VERSION,
+            VERGEML_VERSION,
             true
         );
     }
@@ -464,17 +524,17 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_eml_enqueue_media
+     *  vergeml_enqueue_media
      *
      *  @since    2.0
      *  @created  04/09/14
      */
 
-    add_action( 'wp_enqueue_media', 'wpuxss_eml_enqueue_media' );
+    add_action( 'wp_enqueue_media', 'vergeml_enqueue_media' );
 
-    function wpuxss_eml_enqueue_media() {
+    function vergeml_enqueue_media() {
 
-        global $wpuxss_eml_dir,
+        global $vergeml_dir,
                $current_screen;
 
 
@@ -485,8 +545,8 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
         $media_library_mode = get_user_option( 'media_library_mode', get_current_user_id() ) ? get_user_option( 'media_library_mode', get_current_user_id() ) : 'grid';
 
-        $wpuxss_eml_lib_options = get_option( 'wpuxss_eml_lib_options' );
-        $wpuxss_eml_taxonomies = get_option( 'wpuxss_eml_taxonomies', array() );
+        $vergeml_lib_options = get_option( 'vergeml_lib_options' );
+        $vergeml_taxonomies = get_option( 'vergeml_taxonomies', array() );
         $media_taxonomies = get_object_taxonomies( 'attachment','object' );
         $media_taxonomy_names = array_keys( $media_taxonomies );
 
@@ -496,14 +556,14 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
         $terms = get_terms( array( 'taxonomy' => $media_taxonomy_names, 'fields' => 'all', 'get' => 'all' ) );
-        $terms_id_tt_id_ready_for_script = wpuxss_eml_get_media_term_pairs( $terms, 'id=>tt_id' );
+        $terms_id_tt_id_ready_for_script = vergeml_get_media_term_pairs( $terms, 'id=>tt_id' );
 
 
         $users_ready_for_script = array();
 
-        if( current_user_can( 'manage_options' ) && $wpuxss_eml_lib_options ) {
+        if( current_user_can( 'manage_options' ) && $vergeml_lib_options ) {
 
-            if ( in_array( 'authors', $wpuxss_eml_lib_options['filters_to_show'] ) ) {
+            if ( in_array( 'authors', $vergeml_lib_options['filters_to_show'] ) ) {
 
                 foreach( get_users( array( 'capability' => 'upload_files' ) ) as $user ) {
                     $users_ready_for_script[] = array(
@@ -545,11 +605,11 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
                 );
 
 
-                if ( (bool) $wpuxss_eml_taxonomies[$taxonomy->name]['media_uploader_filter'] ) {
+                if ( (bool) $vergeml_taxonomies[$taxonomy->name]['media_uploader_filter'] ) {
                     $filter_taxonomy_names_ready_for_script[] = $taxonomy->name;
                 }
 
-                if ( ! (bool) $wpuxss_eml_taxonomies[$taxonomy->name]['media_popup_taxonomy_edit'] ) {
+                if ( ! (bool) $vergeml_taxonomies[$taxonomy->name]['media_popup_taxonomy_edit'] ) {
                     $compat_taxonomies_to_hide[] = $taxonomy->name;
                 }
             } // foreach
@@ -560,9 +620,9 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
         wp_enqueue_script(
             'wpuxss-eml-media-models-script',
-            $wpuxss_eml_dir . 'js/eml-media-models.js',
+            $vergeml_dir . 'js/eml-media-models.js',
             array('media-models'),
-            EML_VERSION,
+            VERGEML_VERSION,
             true
         );
 
@@ -574,22 +634,22 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
         //     'wpuxss-eml-tags-box-script',
         //     '/wp-admin/js/tags-box.js',
         //     array(),
-        //     EML_VERSION,
+        //     VERGEML_VERSION,
         //     true
         // );
 
 
         $media_models_l10n = array(
-            'media_orderby'   => $wpuxss_eml_lib_options ? sanitize_text_field( $wpuxss_eml_lib_options['media_orderby'] ) : 'date',
-            'media_order'     => $wpuxss_eml_lib_options ? strtoupper( sanitize_text_field( $wpuxss_eml_lib_options['media_order'] ) ) : 'DESC',
+            'media_orderby'   => $vergeml_lib_options ? sanitize_text_field( $vergeml_lib_options['media_orderby'] ) : 'date',
+            'media_order'     => $vergeml_lib_options ? strtoupper( sanitize_text_field( $vergeml_lib_options['media_order'] ) ) : 'DESC',
             'bulk_edit_nonce' => wp_create_nonce( 'eml-bulk-edit-nonce' ),
-            'natural_sort'    => (bool) $wpuxss_eml_lib_options['natural_sort'],
-            'loads_per_page'  => (int) $wpuxss_eml_lib_options['loads_per_page']
+            'natural_sort'    => (bool) $vergeml_lib_options['natural_sort'],
+            'loads_per_page'  => (int) $vergeml_lib_options['loads_per_page']
         );
 
         wp_localize_script(
             'wpuxss-eml-media-models-script',
-            'wpuxss_eml_media_models_l10n',
+            'vergeml_media_models_l10n',
             $media_models_l10n
         );
 
@@ -601,66 +661,66 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
             'compat_taxonomies'         => $media_taxonomy_names,
             'compat_taxonomies_to_hide' => $compat_taxonomies_to_hide,
             'is_tax_compat'             => count( $media_taxonomy_names ) - count( $compat_taxonomies_to_hide ) > 0 ? 1 : 0,
-            'force_filters'             => (bool) $wpuxss_eml_lib_options['force_filters'],
-            'filter_uploaded'           => (bool) $wpuxss_eml_lib_options['filter_uploaded'],
-            'filters_to_show'           => $wpuxss_eml_lib_options ? array_map( 'sanitize_key', $wpuxss_eml_lib_options['filters_to_show'] ) : array(
+            'force_filters'             => (bool) $vergeml_lib_options['force_filters'],
+            'filter_uploaded'           => (bool) $vergeml_lib_options['filter_uploaded'],
+            'filters_to_show'           => $vergeml_lib_options ? array_map( 'sanitize_key', $vergeml_lib_options['filters_to_show'] ) : array(
                 'types',
                 'dates',
                 'taxonomies'
             ),
             'users'                     => $users_ready_for_script,
-            'uncategorized'             => __( 'All Uncategorized', 'enhanced-media-library' ),
-            'filter_by'                 => __( 'Filter by', 'enhanced-media-library' ),
-            'in'                        => __( 'All', 'enhanced-media-library' ),
-            'not_in'                    => __( 'Not in', 'enhanced-media-library' ),
-            'reset_filters'             => __( 'Reset All Filters', 'enhanced-media-library' ),
-            'author'                    => __( 'author', 'enhanced-media-library' ),
-            'authors'                   => __( 'authors', 'enhanced-media-library' ),
+            'uncategorized'             => __( 'All Uncategorized', 'verge-media-library' ),
+            'filter_by'                 => __( 'Filter by', 'verge-media-library' ),
+            'in'                        => __( 'All', 'verge-media-library' ),
+            'not_in'                    => __( 'Not in', 'verge-media-library' ),
+            'reset_filters'             => __( 'Reset All Filters', 'verge-media-library' ),
+            'author'                    => __( 'author', 'verge-media-library' ),
+            'authors'                   => __( 'authors', 'verge-media-library' ),
             'current_screen'            => isset( $current_screen ) ? $current_screen->id : '',
 
-            'saveButton_success'        => __( 'Saved.', 'enhanced-media-library' ),
-            'saveButton_failure'        => __( 'Something went wrong.', 'enhanced-media-library' ),
-            'saveButton_text'           => __( 'Save Changes', 'enhanced-media-library' ),
+            'saveButton_success'        => __( 'Saved.', 'verge-media-library' ),
+            'saveButton_failure'        => __( 'Something went wrong.', 'verge-media-library' ),
+            'saveButton_text'           => __( 'Save Changes', 'verge-media-library' ),
 
-            'select_all'                => __( 'Select All', 'enhanced-media-library' ),
-            'deselect'                  => __( 'Deselect ', 'enhanced-media-library'),
-            'grid_sidebar_width'        => (int) $wpuxss_eml_lib_options['grid_sidebar_width'],
-            'ideal_column_width'        => (int) $wpuxss_eml_lib_options['ideal_column_width'],
+            'select_all'                => __( 'Select All', 'verge-media-library' ),
+            'deselect'                  => __( 'Deselect ', 'verge-media-library'),
+            'grid_sidebar_width'        => (int) $vergeml_lib_options['grid_sidebar_width'],
+            'ideal_column_width'        => (int) $vergeml_lib_options['ideal_column_width'],
         );
 
         wp_localize_script(
             'wpuxss-eml-media-views-script',
-            'wpuxss_eml_mvln',
+            'vergeml_mvln',
             $media_views_l10n
         );
 
 
-        if ( wpuxss_eml_enhance_media_shortcodes() ) {
+        if ( vergeml_enhance_media_shortcodes() ) {
 
             wp_enqueue_script(
                 'wpuxss-eml-enhanced-medialist-script',
-                $wpuxss_eml_dir . 'js/eml-enhanced-medialist.js',
+                $vergeml_dir . 'js/eml-enhanced-medialist.js',
                 array('media-views'),
-                EML_VERSION,
+                VERGEML_VERSION,
                 true
             );
 
             wp_enqueue_script(
                 'wpuxss-eml-media-editor-script',
-                $wpuxss_eml_dir . 'js/eml-media-editor.js',
+                $vergeml_dir . 'js/eml-media-editor.js',
                 array('media-editor','media-views', 'wpuxss-eml-enhanced-medialist-script'),
-                EML_VERSION,
+                VERGEML_VERSION,
                 true
             );
 
             $enhanced_medialist_l10n = array(
-                'uploaded_to' => __( 'Uploaded to post #', 'enhanced-media-library' ),
-                'based_on' => __( 'Based On', 'enhanced-media-library' )
+                'uploaded_to' => __( 'Uploaded to post #', 'verge-media-library' ),
+                'based_on' => __( 'Based On', 'verge-media-library' )
             );
 
             wp_localize_script(
                 'wpuxss-eml-enhanced-medialist-script',
-                'wpuxss_eml_enhanced_medialist_l10n',
+                'vergeml_enhanced_medialist_l10n',
                 $enhanced_medialist_l10n
             );
         }
@@ -671,31 +731,31 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
             wp_enqueue_script(
                 'wpuxss-eml-media-grid-script',
-                $wpuxss_eml_dir . 'js/eml-media-grid.js',
+                $vergeml_dir . 'js/eml-media-grid.js',
                 array( 'media-grid'),
-                EML_VERSION,
+                VERGEML_VERSION,
                 true
             );
 
             wp_enqueue_script(
                 'wpuxss-eml-media-script',
-                $wpuxss_eml_dir . 'js/eml-media.js',
+                $vergeml_dir . 'js/eml-media.js',
                 array( 'media-grid' ),
-                EML_VERSION,
+                VERGEML_VERSION,
                 true
             );
             
             $media_grid_l10n = array(
-                'grid_show_caption' => (int) $wpuxss_eml_lib_options['grid_show_caption'],
-                'grid_caption_type' => isset( $wpuxss_eml_lib_options['grid_caption_type'] ) ? sanitize_key( $wpuxss_eml_lib_options['grid_caption_type'] ) : 'title',
-                'ideal_column_width' => (int) $wpuxss_eml_lib_options['ideal_column_width'],
-                'more_details' => __( 'More Details', 'enhanced-media-library' ),
-                'less_details' => __( 'Less Details', 'enhanced-media-library' )
+                'grid_show_caption' => (int) $vergeml_lib_options['grid_show_caption'],
+                'grid_caption_type' => isset( $vergeml_lib_options['grid_caption_type'] ) ? sanitize_key( $vergeml_lib_options['grid_caption_type'] ) : 'title',
+                'ideal_column_width' => (int) $vergeml_lib_options['ideal_column_width'],
+                'more_details' => __( 'More Details', 'verge-media-library' ),
+                'less_details' => __( 'Less Details', 'verge-media-library' )
             );
 
             wp_localize_script(
                 'wpuxss-eml-media-grid-script',
-                'wpuxss_eml_media_grid_l10n',
+                'vergeml_media_grid_l10n',
                 $media_grid_l10n
             );
         }
@@ -704,41 +764,41 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_eml_set_options
+     *  vergeml_set_options
      *
      *  @since    2.6
      *  @created  02/05/18
      */
 
-    function wpuxss_eml_set_options() {
+    function vergeml_set_options() {
 
-        $wpuxss_eml_taxonomies  = get_option( 'wpuxss_eml_taxonomies' );
-        $wpuxss_eml_lib_options = get_option( 'wpuxss_eml_lib_options', array() );
-        $wpuxss_eml_tax_options = get_option( 'wpuxss_eml_tax_options', array() );
+        $vergeml_taxonomies  = get_option( 'vergeml_taxonomies' );
+        $vergeml_lib_options = get_option( 'vergeml_lib_options', array() );
+        $vergeml_tax_options = get_option( 'vergeml_tax_options', array() );
 
 
         // taxonomies
-        if ( false === $wpuxss_eml_taxonomies ) {
+        if ( false === $vergeml_taxonomies ) {
 
-            $wpuxss_eml_taxonomies = array(
+            $vergeml_taxonomies = array(
 
                 'media_category' => array(
                     'assigned' => 1,
                     'eml_media' => 1,
 
                     'labels' => array(
-                        'name' => __( 'Media Categories', 'enhanced-media-library' ),
-                        'singular_name' => __( 'Media Category', 'enhanced-media-library' ),
-                        'menu_name' => __( 'Media Categories', 'enhanced-media-library' ),
-                        'all_items' => __( 'All Media Categories', 'enhanced-media-library' ),
-                        'edit_item' => __( 'Edit Media Category', 'enhanced-media-library' ),
-                        'view_item' => __( 'View Media Category', 'enhanced-media-library' ),
-                        'update_item' => __( 'Update Media Category', 'enhanced-media-library' ),
-                        'add_new_item' => __( 'Add New Media Category', 'enhanced-media-library' ),
-                        'new_item_name' => __( 'New Media Category Name', 'enhanced-media-library' ),
-                        'parent_item' => __( 'Parent Media Category', 'enhanced-media-library' ),
-                        'parent_item_colon' => __( 'Parent Media Category:', 'enhanced-media-library' ),
-                        'search_items' => __( 'Search Media Categories', 'enhanced-media-library' )
+                        'name' => __( 'Media Categories', 'verge-media-library' ),
+                        'singular_name' => __( 'Media Category', 'verge-media-library' ),
+                        'menu_name' => __( 'Media Categories', 'verge-media-library' ),
+                        'all_items' => __( 'All Media Categories', 'verge-media-library' ),
+                        'edit_item' => __( 'Edit Media Category', 'verge-media-library' ),
+                        'view_item' => __( 'View Media Category', 'verge-media-library' ),
+                        'update_item' => __( 'Update Media Category', 'verge-media-library' ),
+                        'add_new_item' => __( 'Add New Media Category', 'verge-media-library' ),
+                        'new_item_name' => __( 'New Media Category Name', 'verge-media-library' ),
+                        'parent_item' => __( 'Parent Media Category', 'verge-media-library' ),
+                        'parent_item_colon' => __( 'Parent Media Category:', 'verge-media-library' ),
+                        'search_items' => __( 'Search Media Categories', 'verge-media-library' )
                     ),
 
                     'hierarchical' => 1,
@@ -758,7 +818,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
             );
         }
 
-        // false !== $wpuxss_eml_taxonomies
+        // false !== $vergeml_taxonomies
         else {
 
             $media_taxonomy_args_defaults = array(
@@ -790,39 +850,39 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
             );
 
 
-            foreach( $wpuxss_eml_taxonomies as $taxonomy => $params ) {
+            foreach( $vergeml_taxonomies as $taxonomy => $params ) {
 
                 if ( empty( $params['eml_media'] ) ) {
-                    $wpuxss_eml_taxonomies[$taxonomy]['eml_media'] = 0;
+                    $vergeml_taxonomies[$taxonomy]['eml_media'] = 0;
                 }
 
-                $defaults = (bool) $wpuxss_eml_taxonomies[$taxonomy]['eml_media'] ? $media_taxonomy_args_defaults : $non_media_taxonomy_args_defaults;
+                $defaults = (bool) $vergeml_taxonomies[$taxonomy]['eml_media'] ? $media_taxonomy_args_defaults : $non_media_taxonomy_args_defaults;
 
                 $taxonomy_params = array_intersect_key( $params, $defaults );
-                $wpuxss_eml_taxonomies[$taxonomy] = array_merge( $defaults, $taxonomy_params );
+                $vergeml_taxonomies[$taxonomy] = array_merge( $defaults, $taxonomy_params );
 
-                if ( (bool) $wpuxss_eml_taxonomies[$taxonomy]['eml_media'] && empty( $params['rewrite']['slug'] ) ) {
-                    $wpuxss_eml_taxonomies[$taxonomy]['rewrite']['slug'] = $taxonomy;
+                if ( (bool) $vergeml_taxonomies[$taxonomy]['eml_media'] && empty( $params['rewrite']['slug'] ) ) {
+                    $vergeml_taxonomies[$taxonomy]['rewrite']['slug'] = $taxonomy;
                 }
             } // foreach
         } // if
 
-        update_option( 'wpuxss_eml_taxonomies', $wpuxss_eml_taxonomies );
+        update_option( 'vergeml_taxonomies', $vergeml_taxonomies );
 
 
         // media library options
         $eml_lib_options_defaults = array(
-            'enhance_media_shortcodes' => isset( $wpuxss_eml_tax_options['enhance_media_shortcodes'] ) ? (bool) $wpuxss_eml_tax_options['enhance_media_shortcodes'] : ( isset( $wpuxss_eml_tax_options['enhance_gallery_shortcode'] ) ? (bool) $wpuxss_eml_tax_options['enhance_gallery_shortcode'] : 0 ),
-            'media_orderby' => isset( $wpuxss_eml_tax_options['media_orderby'] ) ? sanitize_text_field( $wpuxss_eml_tax_options['media_orderby'] ) : 'date',
-            'media_order' => isset( $wpuxss_eml_tax_options['media_order'] ) ? strtoupper( sanitize_text_field( $wpuxss_eml_tax_options['media_order'] ) ) : 'DESC',
+            'enhance_media_shortcodes' => isset( $vergeml_tax_options['enhance_media_shortcodes'] ) ? (bool) $vergeml_tax_options['enhance_media_shortcodes'] : ( isset( $vergeml_tax_options['enhance_gallery_shortcode'] ) ? (bool) $vergeml_tax_options['enhance_gallery_shortcode'] : 0 ),
+            'media_orderby' => isset( $vergeml_tax_options['media_orderby'] ) ? sanitize_text_field( $vergeml_tax_options['media_orderby'] ) : 'date',
+            'media_order' => isset( $vergeml_tax_options['media_order'] ) ? strtoupper( sanitize_text_field( $vergeml_tax_options['media_order'] ) ) : 'DESC',
             'natural_sort' => 0,
-            'force_filters' => isset( $wpuxss_eml_tax_options['force_filters'] ) ? (bool) $wpuxss_eml_tax_options['force_filters'] : 1,
+            'force_filters' => isset( $vergeml_tax_options['force_filters'] ) ? (bool) $vergeml_tax_options['force_filters'] : 1,
             'filters_to_show' => array(
                 'types',
                 'dates',
                 'taxonomies'
             ),
-            'show_count' => isset( $wpuxss_eml_tax_options['show_count'] ) ? (bool) $wpuxss_eml_tax_options['show_count'] : 1,
+            'show_count' => isset( $vergeml_tax_options['show_count'] ) ? (bool) $vergeml_tax_options['show_count'] : 1,
             'include_children' => 1,
             'filter_uploaded' => 0,
             'infinite_scrolling' => 0,
@@ -842,16 +902,16 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
             'search_auto' => 1
         );
 
-        $wpuxss_eml_lib_options = array_intersect_key( $wpuxss_eml_lib_options, $eml_lib_options_defaults );
-        $wpuxss_eml_lib_options = array_merge( $eml_lib_options_defaults, $wpuxss_eml_lib_options );
+        $vergeml_lib_options = array_intersect_key( $vergeml_lib_options, $eml_lib_options_defaults );
+        $vergeml_lib_options = array_merge( $eml_lib_options_defaults, $vergeml_lib_options );
 
         // check previous version
-        if ( version_compare( get_option( 'wpuxss_eml_version', '' ), '2.8.9', '<=' ) ) {
+        if ( version_compare( get_option( 'vergeml_version', '' ), '2.8.9', '<=' ) ) {
             // ensure that filenames included in the search by default
-            array_push( $wpuxss_eml_lib_options['search_in'], 'filenames' );
+            array_push( $vergeml_lib_options['search_in'], 'filenames' );
         }
 
-        update_option( 'wpuxss_eml_lib_options', $wpuxss_eml_lib_options );
+        update_option( 'vergeml_lib_options', $vergeml_lib_options );
 
 
         // taxonomy options
@@ -861,19 +921,19 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
             'bulk_edit_save_button' => 0 // since 2.7
         );
 
-        $wpuxss_eml_tax_options = array_intersect_key( $wpuxss_eml_tax_options, $eml_tax_options_defaults );
-        $wpuxss_eml_tax_options = array_merge( $eml_tax_options_defaults, $wpuxss_eml_tax_options );
+        $vergeml_tax_options = array_intersect_key( $vergeml_tax_options, $eml_tax_options_defaults );
+        $vergeml_tax_options = array_merge( $eml_tax_options_defaults, $vergeml_tax_options );
 
-        update_option( 'wpuxss_eml_tax_options', $wpuxss_eml_tax_options );
+        update_option( 'vergeml_tax_options', $vergeml_tax_options );
 
 
         // MIME types
-        if ( false === get_option( 'wpuxss_eml_mimes' ) ) {
+        if ( false === get_option( 'vergeml_mimes' ) ) {
 
             $allowed_mimes = get_allowed_mime_types();
 
             foreach ( wp_get_mime_types() as $ext => $type ) {
-                $wpuxss_eml_mimes[$ext] = array(
+                $vergeml_mimes[$ext] = array(
                     'mime'     => $type,
                     'singular' => $type,
                     'plural'   => $type,
@@ -882,45 +942,45 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
                 );
             }
 
-            update_option( 'wpuxss_eml_mimes', $wpuxss_eml_mimes );
+            update_option( 'vergeml_mimes', $vergeml_mimes );
         }
 
-        if ( version_compare( get_option( 'wpuxss_eml_version', '' ), '2.8.9', '<=' ) ) {
+        if ( version_compare( get_option( 'vergeml_version', '' ), '2.8.9', '<=' ) ) {
             // getting rid of mime type backup
-            delete_site_option( 'wpuxss_eml_mimes_backup' );
+            delete_site_option( 'vergeml_mimes_backup' );
         }
 
-        do_action( 'wpuxss_eml_set_options' );
+        do_action( 'vergeml_set_options' );
     }
 
 
 
     /**
-     *  wpuxss_eml_set_network_options
+     *  vergeml_set_network_options
      *
      *  @since    2.6.3
      *  @created  21/05/18
      */
 
-    function wpuxss_eml_set_network_options() {
+    function vergeml_set_network_options() {
 
-        $wpuxss_eml_network_options = get_site_option( 'wpuxss_eml_network_options', array() );
+        $vergeml_network_options = get_site_option( 'vergeml_network_options', array() );
 
-        $wpuxss_eml_network_options_defaults = array(
+        $vergeml_network_options_defaults = array(
             'media_settings' => 1,
             'utilities' => 1
         );
 
-        $wpuxss_eml_network_options = array_intersect_key( $wpuxss_eml_network_options, $wpuxss_eml_network_options_defaults );
-        $wpuxss_eml_network_options = array_merge( $wpuxss_eml_network_options_defaults, $wpuxss_eml_network_options );
+        $vergeml_network_options = array_intersect_key( $vergeml_network_options, $vergeml_network_options_defaults );
+        $vergeml_network_options = array_merge( $vergeml_network_options_defaults, $vergeml_network_options );
 
-        update_site_option( 'wpuxss_eml_network_options', $wpuxss_eml_network_options );
+        update_site_option( 'vergeml_network_options', $vergeml_network_options );
     }
 
 
 
     /**
-     *  wpuxss_eml_settings_link
+     *  vergeml_settings_link
      *
      *  Add settings link to the plugin action links
      *
@@ -928,15 +988,15 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
      *  @created  27/10/15
      */
 
-    function wpuxss_eml_settings_link( $actions ) {
+    function vergeml_settings_link( $actions ) {
 
         $settings_page = is_network_admin() ? 'settings.php' : 'options-general.php';
 
         if ( ! is_network_admin() ) {
-            $custom_links['settings'] = '<a href="' . self_admin_url($settings_page.'?page=media') . '">' . __( 'Media Settings', 'enhanced-media-library' ) . '</a>';
+            $custom_links['settings'] = '<a href="' . self_admin_url($settings_page.'?page=media') . '">' . __( 'Media Settings', 'verge-media-library' ) . '</a>';
         }
 
-        $custom_links['utility'] = '<a href="' . self_admin_url($settings_page.'?page=eml-settings') . '">' . __( 'Utilities', 'enhanced-media-library' ) . '</a>';
+        $custom_links['utility'] = '<a href="' . self_admin_url($settings_page.'?page=eml-settings') . '">' . __( 'Utilities', 'verge-media-library' ) . '</a>';
 
         return array_merge( $custom_links, $actions );
     }
@@ -944,27 +1004,27 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
 
 
     /**
-     *  wpuxss_eml_plugin_row_meta
+     *  vergeml_plugin_row_meta
      *
      *  @since    2.2.1
      *  @created  11/04/15
      */
 
-    function wpuxss_eml_plugin_row_meta( $plugin_meta, $plugin_file ) {
+    function vergeml_plugin_row_meta( $plugin_meta, $plugin_file ) {
 
-        if ( wpuxss_get_eml_basename() !== $plugin_file ) {
+        if ( vergeml_get_basename() !== $plugin_file ) {
             return $plugin_meta;
         }
 
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/documents/enhanced-media-library" target="_blank">' . __( 'Docs', 'enhanced-media-library' ) . '</a>';
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/support" target="_blank">' . __( 'Support', 'enhanced-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="https://wpuxsolutions.com/documents/enhanced-media-library" target="_blank">' . __( 'Docs', 'verge-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="https://wpuxsolutions.com/support" target="_blank">' . __( 'Support', 'verge-media-library' ) . '</a>';
 
         if ( ! defined( 'EML_IS_PRO' ) ) {
 
-            $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-pro" class="eml-pro" target="_blank">' . __( 'Go PRO', 'enhanced-media-library' ) . '</a>';
+            $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-pro" class="eml-pro" target="_blank">' . __( 'Go PRO', 'verge-media-library' ) . '</a>';
         }
 
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-3-0" class="eml-pro" target="_blank">' . __( '3.0 Beta', 'enhanced-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-3-0" class="eml-pro" target="_blank">' . __( '3.0 Beta', 'verge-media-library' ) . '</a>';
 
         return $plugin_meta;
     }
@@ -978,7 +1038,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
      *  @created  09/2021
      */
 
-    if ( wpuxss_eml_enable_infinite_scrolling() ) {
+    if ( vergeml_enable_infinite_scrolling() ) {
         add_filter( 'media_library_infinite_scrolling', '__return_true' );
     }
 
@@ -993,7 +1053,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
     include_once( 'core/media-templates.php' );
     include_once( 'core/compatibility.php' );
 
-    if ( wpuxss_eml_enhance_media_shortcodes() ) {
+    if ( vergeml_enhance_media_shortcodes() ) {
         include_once( 'core/medialist.php' );
     }
 

@@ -5,22 +5,22 @@ if ( ! defined( 'ABSPATH' ) )
 
 
 
-add_filter( 'shortcode_atts_gallery', 'wpuxss_eml_shortcode_atts', 10, 4 );
-add_filter( 'shortcode_atts_playlist', 'wpuxss_eml_shortcode_atts', 10, 4 );
-add_filter( 'shortcode_atts_slideshow', 'wpuxss_eml_shortcode_atts', 10, 4 );
+add_filter( 'shortcode_atts_gallery', 'vergeml_shortcode_atts', 10, 4 );
+add_filter( 'shortcode_atts_playlist', 'vergeml_shortcode_atts', 10, 4 );
+add_filter( 'shortcode_atts_slideshow', 'vergeml_shortcode_atts', 10, 4 );
 
 
 
 /**
- *  wpuxss_eml_shortcode_atts
+ *  vergeml_shortcode_atts
  *
  *  @since    2.1.6
  *  @created  19/01/16
  */
 
-function wpuxss_eml_shortcode_atts( $output, $defaults = array(), $atts = array(), $shortcode = '' ) {
+function vergeml_shortcode_atts( $output, $defaults = array(), $atts = array(), $shortcode = '' ) {
 
-    $wpuxss_eml_lib_options = get_option( 'wpuxss_eml_lib_options', array() );
+    $vergeml_lib_options = get_option( 'vergeml_lib_options', array() );
 
 
     // 3rd-party plugins can send string as a 3rd param
@@ -69,7 +69,7 @@ function wpuxss_eml_shortcode_atts( $output, $defaults = array(), $atts = array(
                 'field'            => $field,
                 'terms'            => $terms,
                 'operator'         => $operator,
-                'include_children' => (bool) $wpuxss_eml_lib_options['include_children']
+                'include_children' => (bool) $vergeml_lib_options['include_children']
             );
 
             unset( $atts[$taxonomy] );
@@ -81,11 +81,11 @@ function wpuxss_eml_shortcode_atts( $output, $defaults = array(), $atts = array(
     if ( empty( $atts['ids'] ) || $custom_query ) {
 
         if ( empty( $atts['orderby'] ) || 'post__in' === $atts['orderby'] ) {
-            $output['orderby'] = $atts['orderby'] = ( 'menuOrder' === $wpuxss_eml_lib_options['media_orderby'] ) ? 'menu_order' : esc_attr( $wpuxss_eml_lib_options['media_orderby'] );
+            $output['orderby'] = $atts['orderby'] = ( 'menuOrder' === $vergeml_lib_options['media_orderby'] ) ? 'menu_order' : esc_attr( $vergeml_lib_options['media_orderby'] );
         }
 
         if ( empty( $atts['order'] ) ) {
-            $output['order'] = $atts['order'] = esc_attr( $wpuxss_eml_lib_options['media_order'] );
+            $output['order'] = $atts['order'] = esc_attr( $vergeml_lib_options['media_order'] );
         }
     }
 
@@ -167,7 +167,7 @@ function wpuxss_eml_shortcode_atts( $output, $defaults = array(), $atts = array(
 
     if ( $ids ) {
         $output['ids'] = $output['include'] = implode( ',', $ids );
-        $output['orderby'] = ( 'title' === $output['orderby'] && (bool) $wpuxss_eml_lib_options['natural_sort'] ) ? 'post__in' : $output['orderby'];
+        $output['orderby'] = ( 'title' === $output['orderby'] && (bool) $vergeml_lib_options['natural_sort'] ) ? 'post__in' : $output['orderby'];
     }
 
     return $output;

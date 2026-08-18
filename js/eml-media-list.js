@@ -1,6 +1,6 @@
 ( function( $ ) {
 
-    var l10n = wpuxss_eml_media_list_l10n;
+    var l10n = vergeml_media_list_l10n;
 
 
 

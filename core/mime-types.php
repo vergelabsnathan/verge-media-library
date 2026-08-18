@@ -6,14 +6,14 @@ if ( ! defined( 'ABSPATH' ) )
 
 
 /**
- *  wpuxss_eml_mimes_validate
+ *  vergeml_mimes_validate
  *
  *  @type     callback function
  *  @since    1.0
  *  @created  15/10/13
  */
 
-function wpuxss_eml_mimes_validate( $input ) {
+function vergeml_mimes_validate( $input ) {
 
     if ( ! $input ) $input = array();
 
@@ -23,12 +23,12 @@ function wpuxss_eml_mimes_validate( $input ) {
         add_settings_error(
             'mime-types',
             'eml_mime_types_restored',
-            __('MIME Types settings restored.', 'enhanced-media-library'),
+            __('MIME Types settings restored.', 'verge-media-library'),
             'updated'
         );
 
-        remove_filter( 'upload_mimes', 'wpuxss_eml_upload_mimes' );
-        remove_filter( 'mime_types', 'wpuxss_eml_mime_types' );
+        remove_filter( 'upload_mimes', 'vergeml_upload_mimes' );
+        remove_filter( 'mime_types', 'vergeml_mime_types' );
 
         $allowed_mimes    = get_allowed_mime_types();
         $input = array();
@@ -51,14 +51,14 @@ function wpuxss_eml_mimes_validate( $input ) {
     add_settings_error(
         'mime-types',
         'eml_mime_types_saved',
-        __('MIME Types settings saved.', 'enhanced-media-library'),
+        __('MIME Types settings saved.', 'verge-media-library'),
         'updated'
     );
     
 
     foreach ( $input as $ext => $type ) {
 
-        if ( wpuxss_eml_sanitize_extension( $ext ) !== $ext ) {
+        if ( vergeml_sanitize_extension( $ext ) !== $ext ) {
 
             // just unset anything not appropriate as file extension
             // @todo :: add error
@@ -80,7 +80,7 @@ function wpuxss_eml_mimes_validate( $input ) {
 
 
 /**
- *  wpuxss_eml_sanitize_extension
+ *  vergeml_sanitize_extension
  *
  *  Based on the original sanitize_key
  *
@@ -88,7 +88,7 @@ function wpuxss_eml_mimes_validate( $input ) {
  *  @created  24/10/13
  */
 
-function wpuxss_eml_sanitize_extension( $key ) {
+function vergeml_sanitize_extension( $key ) {
 
     $key = strtolower( $key );
     $key = preg_replace( '/[^a-z0-9|]/', '', $key );
@@ -98,7 +98,7 @@ function wpuxss_eml_sanitize_extension( $key ) {
 
 
 /**
- *  wpuxss_eml_post_mime_types
+ *  vergeml_post_mime_types
  * 
  *  Mime types to show in a media library filter
  *
@@ -106,11 +106,11 @@ function wpuxss_eml_sanitize_extension( $key ) {
  *  @created  03/08/13
  */
 
-add_filter( 'post_mime_types', 'wpuxss_eml_post_mime_types' );
+add_filter( 'post_mime_types', 'vergeml_post_mime_types' );
 
-function wpuxss_eml_post_mime_types( $post_mime_types ) {
+function vergeml_post_mime_types( $post_mime_types ) {
 
-    foreach ( get_option( 'wpuxss_eml_mimes', array() ) as $ext => $type_array ) {
+    foreach ( get_option( 'vergeml_mimes', array() ) as $ext => $type_array ) {
 
         if ( (bool) $type_array['filter'] ) {
 
@@ -130,7 +130,7 @@ function wpuxss_eml_post_mime_types( $post_mime_types ) {
 
 
 /**
- *  wpuxss_eml_upload_mimes
+ *  vergeml_upload_mimes
  *
  *  Allowed mime types
  *
@@ -141,13 +141,13 @@ function wpuxss_eml_post_mime_types( $post_mime_types ) {
  *  @created  03/08/13
  */
 
-add_filter( 'upload_mimes', 'wpuxss_eml_upload_mimes', 10, 2 );
+add_filter( 'upload_mimes', 'vergeml_upload_mimes', 10, 2 );
 
-function wpuxss_eml_upload_mimes( $types, $user = null ) {
+function vergeml_upload_mimes( $types, $user = null ) {
 
-    foreach ( get_option( 'wpuxss_eml_mimes', array() ) as $ext => $type_array ) {
+    foreach ( get_option( 'vergeml_mimes', array() ) as $ext => $type_array ) {
 
-        $ext = wpuxss_eml_sanitize_extension( $ext );
+        $ext = vergeml_sanitize_extension( $ext );
 
         // allow any mime type from settings
         if ( (bool) $type_array['upload'] ) {
@@ -175,7 +175,7 @@ function wpuxss_eml_upload_mimes( $types, $user = null ) {
 
 
 /**
- *  wpuxss_eml_mime_types
+ *  vergeml_mime_types
  * 
  *  All mime types
  *
@@ -183,13 +183,13 @@ function wpuxss_eml_upload_mimes( $types, $user = null ) {
  *  @created  03/08/13
  */
 
-add_filter( 'mime_types', 'wpuxss_eml_mime_types' );
+add_filter( 'mime_types', 'vergeml_mime_types' );
 
-function wpuxss_eml_mime_types( $types ) {
+function vergeml_mime_types( $types ) {
 
-    foreach ( get_option( 'wpuxss_eml_mimes', array() ) as $ext => $type_array ) {
+    foreach ( get_option( 'vergeml_mimes', array() ) as $ext => $type_array ) {
 
-        $ext = wpuxss_eml_sanitize_extension( $ext );
+        $ext = vergeml_sanitize_extension( $ext );
 
         if ( ! isset( $types[$ext] ) ) {
             $types[$ext] = sanitize_mime_type( $type_array['mime'] );
@@ -202,7 +202,7 @@ function wpuxss_eml_mime_types( $types ) {
 
 
 /**
- *  wpuxss_eml_check_filetype_and_ext
+ *  vergeml_check_filetype_and_ext
  *
  *  Vetting allowed mime types
  *
@@ -215,9 +215,9 @@ function wpuxss_eml_mime_types( $types ) {
  *  @created  2020/10
  */
 
-add_filter( 'wp_check_filetype_and_ext', 'wpuxss_eml_check_filetype_and_ext', 10, 5 );
+add_filter( 'wp_check_filetype_and_ext', 'vergeml_check_filetype_and_ext', 10, 5 );
 
-function wpuxss_eml_check_filetype_and_ext( $types, $file, $filename, $mimes, $real_mime = false ) {
+function vergeml_check_filetype_and_ext( $types, $file, $filename, $mimes, $real_mime = false ) {
 
     /*
      * If the type has been set by WP - there is nothing to do
@@ -313,9 +313,9 @@ function wpuxss_eml_check_filetype_and_ext( $types, $file, $filename, $mimes, $r
 
 
 // @todo ::
-// add_filter( 'wp_handle_upload_overrides', 'wpuxss_eml_handle_upload_overrides', 10, 2 );
+// add_filter( 'wp_handle_upload_overrides', 'vergeml_handle_upload_overrides', 10, 2 );
 
-// function wpuxss_eml_handle_upload_overrides( $overrides, $file ) {
+// function vergeml_handle_upload_overrides( $overrides, $file ) {
 //     return $overrides;
 // }
 
@@ -336,7 +336,7 @@ add_filter( 'wp_generate_attachment_metadata', function( $metadata, $attachment_
 
     if ( get_post_mime_type( $attachment_id ) == 'image/svg+xml' ) {
         $svg_path = get_attached_file( $attachment_id );
-        $dimensions = wpuxss_eml_svg_dimensions( $svg_path );
+        $dimensions = vergeml_svg_dimensions( $svg_path );
         $metadata['width'] = $dimensions->width;
         $metadata['height'] = $dimensions->height;
     }
@@ -366,7 +366,7 @@ add_filter( 'wp_prepare_attachment_for_js', function( $response, $attachment, $m
             $svg_path = $response['url'];
         }
 
-        $dimensions = wpuxss_eml_svg_dimensions( $svg_path );
+        $dimensions = vergeml_svg_dimensions( $svg_path );
         $response['sizes'] = array(
             'full' => array(
                 'url'         => $response['url'],
@@ -383,7 +383,7 @@ add_filter( 'wp_prepare_attachment_for_js', function( $response, $attachment, $m
 
 
 /**
- *  wpuxss_eml_svg_dimensions
+ *  vergeml_svg_dimensions
  *
  *  Get SVG dimensions
  *
@@ -391,7 +391,7 @@ add_filter( 'wp_prepare_attachment_for_js', function( $response, $attachment, $m
  *  @created  12/2021
  */
 
-function wpuxss_eml_svg_dimensions( $svg ) {
+function vergeml_svg_dimensions( $svg ) {
 
     $svg = simplexml_load_file( $svg );
     $width = 0;

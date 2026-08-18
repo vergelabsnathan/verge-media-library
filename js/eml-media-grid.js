@@ -1,6 +1,6 @@
 window.wp = window.wp || {};
 window.wpCookies = window.wpCookies || {};
-window.eml = window.eml || { l10n: {} };
+window.vergeml = window.vergeml || { l10n: {} };
 
 
 
@@ -14,7 +14,7 @@ window.eml = window.eml || { l10n: {} };
 
 
 
-    _.extend( eml.l10n, wpuxss_eml_media_grid_l10n );
+    _.extend( vergeml.l10n, vergeml_media_grid_l10n );
 
 
 
@@ -80,7 +80,7 @@ window.eml = window.eml || { l10n: {} };
 
             // collapse
             this.$el.find('.setting, #alt-text-description').wrapAll( '<div class="eml-collapse" />' );
-            this.$el.find('.compat-meta').before( '<a class="eml-toggle-collapse" href="javascript:;">'+eml.l10n.more_details+'</a>' );
+            this.$el.find('.compat-meta').before( '<a class="eml-toggle-collapse" href="javascript:;">'+vergeml.l10n.more_details+'</a>' );
 
             this.toggleCollapse();
         },
@@ -104,7 +104,7 @@ window.eml = window.eml || { l10n: {} };
             }
 
             this.$el.find('.eml-toggle-collapse').html(function(i, html) {
-                return ! collapsed ? eml.l10n.less_details+' \u2191' : eml.l10n.more_details+' \u2193';
+                return ! collapsed ? vergeml.l10n.less_details+' \u2191' : vergeml.l10n.more_details+' \u2193';
             });
 
             this.controller._attachmentDetailsCollapsed = collapsed ? 'true' : 'false';

@@ -1,9 +1,9 @@
-window.eml = window.eml || { l10n: {} };
+window.vergeml = window.vergeml || { l10n: {} };
 
 
 ( function( $, _ ) {
 
-    _.extend( eml.l10n, wpuxss_eml_mimetype_options_l10n_data );
+    _.extend( vergeml.l10n, vergeml_mimetype_options_l10n_data );
 
 
 
@@ -33,11 +33,11 @@ window.eml = window.eml || { l10n: {} };
 
         $(this).val(extension);
 
-        mime_type_tr.find('.wpuxss-eml-mime').attr('name','wpuxss_eml_mimes['+extension+'][mime]');
-        mime_type_tr.find('.wpuxss-eml-singular').attr('name','wpuxss_eml_mimes['+extension+'][singular]');
-        mime_type_tr.find('.wpuxss-eml-plural').attr('name','wpuxss_eml_mimes['+extension+'][plural]');
-        mime_type_tr.find('.wpuxss-eml-filter').attr('name','wpuxss_eml_mimes['+extension+'][filter]');
-        mime_type_tr.find('.wpuxss-eml-upload').attr('name','wpuxss_eml_mimes['+extension+'][upload]');
+        mime_type_tr.find('.wpuxss-eml-mime').attr('name','vergeml_mimes['+extension+'][mime]');
+        mime_type_tr.find('.wpuxss-eml-singular').attr('name','vergeml_mimes['+extension+'][singular]');
+        mime_type_tr.find('.wpuxss-eml-plural').attr('name','vergeml_mimes['+extension+'][plural]');
+        mime_type_tr.find('.wpuxss-eml-filter').attr('name','vergeml_mimes['+extension+'][filter]');
+        mime_type_tr.find('.wpuxss-eml-upload').attr('name','vergeml_mimes['+extension+'][upload]');
     });
 
 
@@ -59,10 +59,10 @@ window.eml = window.eml || { l10n: {} };
 
         event.preventDefault();
 
-        emlConfirmDialog( eml.l10n.mime_restoring_confirm_title, eml.l10n.mime_restoring_confirm_text, eml.l10n.mime_restoring_yes, eml.l10n.cancel, 'button button-primary eml-warning-button' )
+        emlConfirmDialog( vergeml.l10n.mime_restoring_confirm_title, vergeml.l10n.mime_restoring_confirm_text, vergeml.l10n.mime_restoring_yes, vergeml.l10n.cancel, 'button button-primary eml-warning-button' )
         .done( function() {
 
-            emlFullscreenSpinnerStart( eml.l10n.in_progress_restoring_text );
+            emlFullscreenSpinnerStart( vergeml.l10n.in_progress_restoring_text );
 
             $('<input type="hidden"/>').attr( 'name', name )
                 .val( value )
@@ -80,7 +80,7 @@ window.eml = window.eml || { l10n: {} };
     $( '#wpuxss-eml-form-mimetypes' ).on( 'submit', function( event ) {
 
         var submit_it = true,
-            alert_title = eml.l10n.mime_error_cannot_save_title,
+            alert_title = vergeml.l10n.mime_error_cannot_save_title,
             alert_text = '';
 
         $('.wpuxss-eml-clone-mime').each( function( index ) {
@@ -89,13 +89,13 @@ window.eml = window.eml || { l10n: {} };
                       $('.wpuxss-eml-mime[value="'+$('.wpuxss-eml-mime',this).val()+'"]').length > 0 ) {
 
                 submit_it = false;
-                alert_text = '<p>' + eml.l10n.mime_error_duplicate + '</p>';
+                alert_text = '<p>' + vergeml.l10n.mime_error_duplicate + '</p>';
             }
             else if ( ! $('.wpuxss-eml-type',this).val() || $('.wpuxss-eml-type',this).val() == '' ||
                  ! $('.wpuxss-eml-mime',this).val() || $('.wpuxss-eml-mime',this).val() == '' ) {
 
                 submit_it = false;
-                alert_text = '<p>' + eml.l10n.mime_error_empty_fields + '</p>';
+                alert_text = '<p>' + vergeml.l10n.mime_error_empty_fields + '</p>';
             }
 
 
@@ -109,7 +109,7 @@ window.eml = window.eml || { l10n: {} };
 
         if ( ! submit_it ) {
 
-            emlAlertDialog( alert_title, alert_text, eml.l10n.okay, 'button button-primary' )
+            emlAlertDialog( alert_title, alert_text, vergeml.l10n.okay, 'button button-primary' )
             .done( function() {
                 return false;
             });

@@ -1,26 +1,35 @@
-=== Enhanced Media Library ===
-Contributors: webbistro
-Donate link: https://wpuxsolutions.com/plugins/enhanced-media-library-pro
+=== Verge Media Library ===
+Contributors: vergelabsnathan
 Tags: media library, media folders, media tags, media categories, mime types
-Requires at least: 6.0
-Tested up to: 6.5.5
-Requires PHP: 5.6
-Stable tag: 2.9.4
+Requires at least: 6.5
+Tested up to: 7.0
+Requires PHP: 7.4
+Stable tag: 2.9.5
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-This plugin would be handy for those who need to manage a lot of media files.
+Categories, tags and custom taxonomies for the media library. A maintained fork of Enhanced Media Library, repaired for WordPress 7.
 
 ## Description ##
 
 **Handy for those who need to manage a lot of media files.**
 
-[Known Issues :: Support](https://wpuxsolutions.com/support) | [Changelog](https://wpuxsolutions.com/documents/enhanced-media-library/changelog) | [Usage Guide :: How to](https://wpuxsolutions.com/documents/enhanced-media-library) | [FAQs](https://wpuxsolutions.com/documents/enhanced-media-library/faqs-2) | [Premium Features](https://wpuxsolutions.com/plugins/enhanced-media-library-pro)
+Verge Media Library is a maintained fork of [Enhanced Media Library](https://wordpress.org/plugins/enhanced-media-library/) by wpUXsolutions, which has had no release since July 2024. It repairs the media toolbar on WordPress 7.0 and clears the PHP 8 warnings. Everything else is the plugin you already know.
+
+Based on Enhanced Media Library by wpUXsolutions, and licensed GPLv2 or later as the original is.
+
+[Source and issue tracker](https://github.com/vergelabsnathan/verge-media-library)
 
 
-### Officially! **EML 3.0 Early Beta** is available for testing ###
+### What this fork fixes ###
 
-* [Give it a try](https://wpuxsolutions.com/plugins/enhanced-media-library-3-0), share feedback, report bugs, and **help the developer** to deliver it promptly!
+* **The WordPress 7.0 toolbar layout.** WP 7.0 turned the media toolbar into a fixed two-column CSS grid and gave placement to its own two filters only. The extra filters this plugin adds had nowhere to go, so they stacked into a 300px-tall block with every label sitting above the wrong control. The toolbar is one tidy row again, whatever number of filters you enable.
+* **The author filter drew on top of the type filter.** It rendered with the same HTML id as the type filter, which was invisible under the old layout but made the two overlap once WordPress started placing elements by id. It now uses the id its own label was already pointing at, which fixes the overlap and the mislabelled control together.
+* **PHP 8 warnings.** The four settings handlers read their nonce field before checking whether it was there. Also four `get_terms()` calls still using the argument order deprecated back in WordPress 4.5.
+
+### Moving over from Enhanced Media Library ###
+
+Activating this plugin copies your existing Enhanced Media Library settings across: taxonomies, MIME types, library and filter options. The originals are left untouched, so nothing is lost if you switch back. Deactivate Enhanced Media Library before activating this one, since running both at once means two copies of the same taxonomies.
 
 
 ### Categorize by Anything! ###
@@ -183,6 +192,19 @@ Please notice that you use Enhanced Media Library with other plugins that add me
 
 
 ## Changelog ##
+
+### 2.9.5 ###
+*First release of the Verge Media Library fork*
+
+= Bugfixes =
+* Media toolbar layout repaired on WordPress 7.0. Core made `.media-toolbar-secondary` a fixed 2x2 CSS grid and placed only its own two filters explicitly; every control this plugin adds fell into implicit auto-placement and stacked below the toolbar with labels attached to the wrong controls. Measured on WP 7.0.4, the toolbar goes from 300px and six grid rows back to 66px and two.
+* The author filter rendered with the same HTML id as the type filter. Under the new id-based placement both were assigned the same grid cell and drew on top of each other, hiding the type filter. The author filter now uses the id its label already referenced, which also reconnects that label to the right control.
+* Undefined array key warnings on PHP 8 from the settings export, import, restore and cleanup handlers, which read their nonce field before checking it existed. With WP_DEBUG on, each also produced a run of "Cannot modify header information" warnings.
+* Four `get_terms()` calls updated from the taxonomy-first signature deprecated in WordPress 4.5.
+
+= Fork notes =
+* Renamed from Enhanced Media Library, with all functions, classes, options and hooks moved off the `wpuxss_eml_` prefix so both plugins can be installed without a fatal redeclaration.
+* Activation copies existing Enhanced Media Library settings across, leaving the originals in place.
 
 ### 2.9.4 ###
 *Release Date - July 15, 2024*

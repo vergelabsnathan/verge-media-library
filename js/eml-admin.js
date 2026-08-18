@@ -1,9 +1,9 @@
-window.eml = window.eml || { l10n: {} };
+window.vergeml = window.vergeml || { l10n: {} };
 
 
 ( function( $ ) {
 
-    _.extend( eml.l10n, wpuxss_eml_admin_l10n );
+    _.extend( vergeml.l10n, vergeml_admin_l10n );
 
 
 
@@ -25,7 +25,7 @@ window.eml = window.eml || { l10n: {} };
         w = '50%';
 
 
-    window.emlConfirmDialog = function( title, html, yes, no, yesClass ) {
+    window.vergemlConfirmDialog = function( title, html, yes, no, yesClass ) {
 
         var def = $.Deferred(),
 
@@ -66,7 +66,7 @@ window.eml = window.eml || { l10n: {} };
     }
 
 
-    window.emlAlertDialog = function( title, html, yes, yesClass ) {
+    window.vergemlAlertDialog = function( title, html, yes, yesClass ) {
 
         var def = $.Deferred(),
 
@@ -100,12 +100,12 @@ window.eml = window.eml || { l10n: {} };
     }
 
 
-    window.emlFullscreenSpinnerStart = function( text ) {
+    window.vergemlFullscreenSpinnerStart = function( text ) {
         $('body').append( '<div class="fullscreen-spinner-box"><div class="fullscreen-spinner-inner-box"><span class="eml-spinner">'+text+'</span></div></div>' );
     }
 
 
-    window.emlFullscreenSpinnerStop = function() {
+    window.vergemlFullscreenSpinnerStop = function() {
         $('.fullscreen-spinner-box').remove();
     }
 
@@ -114,7 +114,7 @@ window.eml = window.eml || { l10n: {} };
         var notice_id = $( event.currentTarget ).parent('.eml-admin-notice').attr('id');
 
         $.post( ajaxurl, {
-            nonce:     eml.l10n.admin_notice_nonce,
+            nonce:     vergeml.l10n.admin_notice_nonce,
             action:    'eml-admin-notice-dismiss',
             notice_id: notice_id
         });        

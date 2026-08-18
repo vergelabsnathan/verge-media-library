@@ -14,19 +14,19 @@ if ( ! defined( 'ABSPATH' ) )
  *  @created  28/01/18
  */
 
-add_action( 'elementor/editor/before_enqueue_scripts', 'wpuxss_eml_register_scripts' );
+add_action( 'elementor/editor/before_enqueue_scripts', 'vergeml_register_scripts' );
 
-add_action( 'elementor/editor/after_enqueue_scripts', 'wpuxss_eml_elementor_scripts' );
+add_action( 'elementor/editor/after_enqueue_scripts', 'vergeml_elementor_scripts' );
 
-function wpuxss_eml_elementor_scripts() {
+function vergeml_elementor_scripts() {
 
-    global $wpuxss_eml_dir;
+    global $vergeml_dir;
 
 
     wp_enqueue_style( 'common' );
     wp_enqueue_style(
         'wpuxss-eml-elementor-media-style',
-        $wpuxss_eml_dir . 'css/eml-admin-media.css'
+        $vergeml_dir . 'css/eml-admin-media.css'
     );
 }
 
@@ -41,9 +41,9 @@ function wpuxss_eml_elementor_scripts() {
  *  @created  08/2021
  */
 
-add_action( 'after_setup_theme', 'wpuxss_eml_after_setup_theme_impreza', 9 );
+add_action( 'after_setup_theme', 'vergeml_after_setup_theme_impreza', 9 );
 
-function wpuxss_eml_after_setup_theme_impreza() {
+function vergeml_after_setup_theme_impreza() {
 
     remove_filter( 'attachment_fields_to_edit', 'us_attachment_fields_to_edit_categories' );
 }
@@ -57,9 +57,9 @@ function wpuxss_eml_after_setup_theme_impreza() {
  *  @created  10/2021
  */
 
-add_action( 'wp_loaded', 'wpuxss_eml_compat_on_wp_loaded' );
+add_action( 'wp_loaded', 'vergeml_compat_on_wp_loaded' );
 
-function wpuxss_eml_compat_on_wp_loaded() {
+function vergeml_compat_on_wp_loaded() {
 
     remove_filter( 'ajax_query_attachments_args', 'pgc_sgb_ajaxQueryAttachmentsArgs', 20 );
 }
@@ -73,7 +73,7 @@ function wpuxss_eml_compat_on_wp_loaded() {
  *  @created  10/2020
  */
 
-if ( wpuxss_eml_enhance_media_shortcodes() ) {
+if ( vergeml_enhance_media_shortcodes() ) {
 
     /**
      *  Enfold Theme
@@ -98,10 +98,10 @@ if ( wpuxss_eml_enhance_media_shortcodes() ) {
 
         if ( 'Enfold' === $wp_theme->get( 'Name' ) && version_compare( $wp_theme->get( 'Version' ), '4.8.4', '>=') ) {
 
-            add_filter( 'shortcode_atts_av_masonry_gallery', 'wpuxss_eml_shortcode_atts', 10, 3 );
+            add_filter( 'shortcode_atts_av_masonry_gallery', 'vergeml_shortcode_atts', 10, 3 );
         }   
         else {
-            add_filter( 'shortcode_atts_av_masonry_entries', 'wpuxss_eml_shortcode_atts', 10, 3 );
+            add_filter( 'shortcode_atts_av_masonry_entries', 'vergeml_shortcode_atts', 10, 3 );
         }
     }
 
@@ -113,15 +113,15 @@ if ( wpuxss_eml_enhance_media_shortcodes() ) {
      *  @created  08/04/21
      */
 
-    add_filter( 'foogallery_shortcode_atts', 'wpuxss_eml_foogallery_shortcode_atts' );
+    add_filter( 'foogallery_shortcode_atts', 'vergeml_foogallery_shortcode_atts' );
 }
 
-function wpuxss_eml_foogallery_shortcode_atts( $atts ) {
+function vergeml_foogallery_shortcode_atts( $atts ) {
 
     $id = isset( $atts['id'] ) ? intval( $atts['id'] ) : 0;
     unset( $atts['id'] );
 
-    $atts = wpuxss_eml_shortcode_atts( array(), array(), $atts );
+    $atts = vergeml_shortcode_atts( array(), array(), $atts );
     $atts['id'] = $id;
 
     if ( isset( $atts['ids'] ) ) {

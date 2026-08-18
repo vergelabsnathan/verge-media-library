@@ -1,5 +1,5 @@
 window.wp = window.wp || {};
-window.eml = window.eml || { l10n: {} };
+window.vergeml = window.vergeml || { l10n: {} };
 
 
 ( function( $, _ ) {
@@ -10,10 +10,10 @@ window.eml = window.eml || { l10n: {} };
 
 
     /**
-     * eml.mediaCollection
+     * vergeml.mediaCollection
      *
      */
-    eml.mediaCollection = {
+    vergeml.mediaCollection = {
 
         collections: {},
 
@@ -74,7 +74,7 @@ window.eml = window.eml || { l10n: {} };
                     args.uploadedTo = attrs.id;
                 }
 
-                _.each( eml.l10n.taxonomies, function( terms, taxonomy ) {
+                _.each( vergeml.l10n.taxonomies, function( terms, taxonomy ) {
 
                     if ( attrs[taxonomy] ) {
                         args[taxonomy] = attrs[taxonomy];
@@ -166,7 +166,7 @@ window.eml = window.eml || { l10n: {} };
             }
 
 
-            _.each( eml.l10n.taxonomies, function( terms, taxonomy ) {
+            _.each( vergeml.l10n.taxonomies, function( terms, taxonomy ) {
 
                 if ( props[taxonomy] ) {
                     attrs[taxonomy] = props[taxonomy];
@@ -224,7 +224,7 @@ window.eml = window.eml || { l10n: {} };
 
     delete media.gallery.defaults.id;
 
-    _.extend( media.gallery, eml.mediaCollection );
+    _.extend( media.gallery, vergeml.mediaCollection );
 
 
 
@@ -240,7 +240,7 @@ window.eml = window.eml || { l10n: {} };
 
     delete media.playlist.defaults.id;
 
-    _.extend( media.playlist, eml.mediaCollection );
+    _.extend( media.playlist, vergeml.mediaCollection );
 
 
 })( jQuery, _ );

@@ -1,5 +1,5 @@
 window.wp = window.wp || {};
-window.eml = window.eml || { l10n: {} };
+window.vergeml = window.vergeml || { l10n: {} };
 
 
 
@@ -17,7 +17,7 @@ function emlIsFilterBased( attrs ) {
         return true;
     }
 
-    return _.some( eml.l10n.taxonomies, function( terms, taxonomy ) {
+    return _.some( vergeml.l10n.taxonomies, function( terms, taxonomy ) {
         return ( ! _.isUndefined( attrs[taxonomy] ) && ! _.isNull( attrs[taxonomy] ) );
     });
 }
@@ -31,7 +31,7 @@ function emlIsFilterBased( attrs ) {
 
 
 
-    _.extend( eml.l10n, wpuxss_eml_enhanced_medialist_l10n );
+    _.extend( vergeml.l10n, vergeml_enhanced_medialist_l10n );
 
 
 
@@ -143,7 +143,7 @@ function emlIsFilterBased( attrs ) {
         render: function() {
 
             var library = this.controller.frame.state().get('library'),
-                append = eml.basedOnHTML( library );
+                append = vergeml.basedOnHTML( library );
 
 
             original.Settings.Gallery.render.apply( this, arguments );
@@ -180,7 +180,7 @@ function emlIsFilterBased( attrs ) {
         render: function() {
 
             var library = this.controller.frame.state().get('library'),
-                append = eml.basedOnHTML( library );
+                append = vergeml.basedOnHTML( library );
 
 
             original.Settings.Playlist.render.apply( this, arguments );
@@ -196,14 +196,14 @@ function emlIsFilterBased( attrs ) {
 
 
     /**
-     * eml.basedOnHTML
+     * vergeml.basedOnHTML
      *
      * output for:
      * wp.media.view.Settings.Gallery
      * wp.media.view.Settings.Playlist
      *
      */
-    eml.basedOnHTML = function( library ) {
+    vergeml.basedOnHTML = function( library ) {
 
         var isFilterBased = emlIsFilterBased( library.props.toJSON() ),
             append = '',
@@ -215,9 +215,9 @@ function emlIsFilterBased( attrs ) {
 
         if ( isFilterBased ) {
 
-            append = '<br class="clear" /><h3>' + eml.l10n.based_on + '</h3><span class="setting eml-filter-based"><ul class="eml-filter-based">';
+            append = '<br class="clear" /><h3>' + vergeml.l10n.based_on + '</h3><span class="setting eml-filter-based"><ul class="eml-filter-based">';
 
-            _.each( eml.l10n.taxonomies, function( attrs, taxonomy ) {
+            _.each( vergeml.l10n.taxonomies, function( attrs, taxonomy ) {
 
                 var terms = library.props.get( taxonomy ),
                     split, join, 
@@ -263,7 +263,7 @@ function emlIsFilterBased( attrs ) {
                     append += '<li>' + media.view.l10n.uploadedToThisPost + '</li>';
                 }
                 else if ( parseInt( uploadedTo ) ) {
-                    append += '<li>' + eml.l10n.uploaded_to + uploadedTo + '</li>';
+                    append += '<li>' + vergeml.l10n.uploaded_to + uploadedTo + '</li>';
                 }
             }
             append += '</ul></span>';
@@ -275,14 +275,14 @@ function emlIsFilterBased( attrs ) {
 
 
     /**
-     * eml.renderSettings
+     * vergeml.renderSettings
      *
      * for:
      * wp.media.controller.GalleryEdit
      * wp.media.controller.CollectionEdit (Playlist)
      *
      */
-    eml.renderSettings = function( browser, library, tag ) {
+    vergeml.renderSettings = function( browser, library, tag ) {
 
         var reverse = browser.toolbar.get( 'reverse' );
 
@@ -330,7 +330,7 @@ function emlIsFilterBased( attrs ) {
 
             original.GalleryEdit.gallerySettings.apply( this, arguments );
 
-            eml.renderSettings( browser, library, media.gallery.tag );
+            vergeml.renderSettings( browser, library, media.gallery.tag );
         }
     });
 
@@ -353,7 +353,7 @@ function emlIsFilterBased( attrs ) {
 
             original.CollectionEdit.renderSettings.apply( this, arguments );
 
-            eml.renderSettings( browser, library, media.playlist.tag );
+            vergeml.renderSettings( browser, library, media.playlist.tag );
         }
     });
 

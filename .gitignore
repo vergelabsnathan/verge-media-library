@@ -9,3 +9,4 @@ dist/
 .phpunit.result.cache
 .DS_Store
 Thumbs.db
+.release-assets/

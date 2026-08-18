@@ -487,6 +487,7 @@
                         order = 1,
                         show = vergeml.l10n.filters_to_show || [],
                         isEmlGrid = this.controller.isModeActive('eml-grid'),
+                        borrowedGridMode,
                         frameToolbar,
                         wantsFilters =
                             -1 !== $.inArray(this.options.filters, ['uploaded', 'all']) ||
@@ -506,8 +507,31 @@
                      *  filters-heading was missing: anything core adds after the
                      *  fork is taken never appears at all. Wrapping means core's
                      *  additions arrive on their own.
+                     *
+                     *  This frame runs as 'eml-grid' rather than core's 'grid', so
+                     *  core's grid branch is skipped and its Bulk select and Delete
+                     *  selected buttons are never built. Claim 'grid' for the
+                     *  duration of the call so core builds them, with its own trash
+                     *  and delete handling, then hand the mode straight back.
+                     *
+                     *  Claiming it permanently instead pulls in core's grid
+                     *  stylesheet, which hides the individual filter labels behind
+                     *  the screen-reader heading. That is core's design but not this
+                     *  plugin's, and it collapses the filters into stacked columns.
+                     *  Borrowing the mode gets the buttons without the restyle.
                      */
+                    borrowedGridMode =
+                        isEmlGrid && !this.controller.isModeActive('grid');
+
+                    if (borrowedGridMode) {
+                        this.controller.activateMode('grid');
+                    }
+
                     core.AttachmentsBrowser.createToolbar.apply(this, arguments);
+
+                    if (borrowedGridMode) {
+                        this.controller.deactivateMode('grid');
+                    }
 
                     if (!this.toolbar) {
                         return;
@@ -594,6 +618,13 @@
                         );
                     }
 
+                    /*
+                     *  Our filters sit between core's date filter at -75 and core's
+                     *  Bulk select at -70, so they read as one run and the button
+                     *  lands after them rather than wedged between two dropdowns.
+                     *  Fractional steps because there are only four integers in
+                     *  that gap and a site can assign more taxonomies than that.
+                     */
                     if (wantsFilters) {
                         // ---- filter by author ----
                         if (vergeml.l10n.users.length > 1 && -1 !== $.inArray('authors', show)) {
@@ -602,7 +633,7 @@
                                 new media.view.Label({
                                     value: vergeml.l10n.filter_by + ' ' + vergeml.l10n.author,
                                     attributes: { for: 'author-filter' },
-                                    priority: order++ - 70,
+                                    priority: -75 + order++ * 0.1,
                                 }).render(),
                             );
                             this.toolbar.set(
@@ -610,7 +641,7 @@
                                 new media.view.AttachmentFilters.Authors({
                                     controller: this.controller,
                                     model: this.collection.props,
-                                    priority: order++ - 70,
+                                    priority: -75 + order++ * 0.1,
                                     users: vergeml.l10n.users,
                                 }).render(),
                             );
@@ -633,7 +664,7 @@
                                         attributes: {
                                             for: 'media-attachment-' + taxonomy + '-filters',
                                         },
-                                        priority: order++ - 70,
+                                        priority: -75 + order++ * 0.1,
                                     }).render(),
                                 );
                                 browser.toolbar.set(
@@ -641,7 +672,7 @@
                                     new media.view.AttachmentFilters.Taxonomy({
                                         controller: browser.controller,
                                         model: browser.collection.props,
-                                        priority: order++ - 70,
+                                        priority: -75 + order++ * 0.1,
                                         taxonomy: taxonomy,
                                         termList: data.term_list,
                                         singularName: data.singular_name,
@@ -659,7 +690,7 @@
                                     controller: this.controller,
                                     text: vergeml.l10n.reset_filters,
                                     disabled: true,
-                                    priority: order++ - 70,
+                                    priority: -75 + order++ * 0.1,
                                 }).render(),
                             );
                         }

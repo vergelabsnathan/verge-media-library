@@ -358,14 +358,19 @@ window.vergeml = window.vergeml || { l10n: {} };
                 library:   {}, // Options hash for the query to the media library.
                 uploader:  true,
 
-                multiple : true, 
+                multiple : true,
                 state    : 'library',
                 mode     : [ 'eml-grid', 'edit' ]
             });
 
-            // this.$body = $( document.body );
-            // this.$window = $( window );
-            // this.$adminBar = $( '#wpadminbar' );
+            /*
+             *  bindKeydown and unbindKeydown both use this.$body to hook Escape
+             *  while bulk select is open. Upstream commented the assignment out,
+             *  which left them throwing on undefined. It never surfaced because
+             *  select mode could not be entered on this frame in the first place.
+             */
+            this.$body = $( document.body );
+
             this.$uploaderToggler = $( '.page-title-action' )
                 .attr( 'aria-expanded', 'false' )
                 .on( 'click', _.bind( this.addNewClickHandler, this ) );

@@ -974,7 +974,7 @@ function wpuxss_eml_save_attachment_compat() {
 
     if ( (bool) $wpuxss_eml_lib_options['show_count'] ) {
 
-        $terms = get_terms( $media_taxonomy_names, array('fields'=>'all','get'=>'all') );
+        $terms = get_terms( array( 'taxonomy' => $media_taxonomy_names, 'fields' => 'all', 'get' => 'all' ) );
         $term_pairs = wpuxss_eml_get_media_term_pairs( $terms, 'id=>tt_id' );
     }
 
@@ -1054,7 +1054,7 @@ function wpuxss_eml_delete_post() {
 
             if ( (bool) $wpuxss_eml_lib_options['show_count'] ) {
 
-                $terms = get_terms( get_object_taxonomies( 'attachment','names' ), array('fields'=>'all','get'=>'all') );
+                $terms = get_terms( array( 'taxonomy' => get_object_taxonomies( 'attachment', 'names' ), 'fields' => 'all', 'get' => 'all' ) );
 
                 foreach( wpuxss_eml_get_media_term_pairs( $terms, 'id=>tt_id' ) as $term_id => $tt_id ) {
                     $response['tcount'][$term_id] = wpuxss_eml_get_media_term_count( $term_id, $tt_id );

@@ -495,7 +495,7 @@ if ( ! function_exists( 'wpuxss_get_eml_slug' ) ) {
         $compat_taxonomies_to_hide = array();
 
 
-        $terms = get_terms( $media_taxonomy_names, array('fields'=>'all','get'=>'all') );
+        $terms = get_terms( array( 'taxonomy' => $media_taxonomy_names, 'fields' => 'all', 'get' => 'all' ) );
         $terms_id_tt_id_ready_for_script = wpuxss_eml_get_media_term_pairs( $terms, 'id=>tt_id' );
 
 

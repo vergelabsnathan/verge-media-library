@@ -1223,7 +1223,7 @@ function wpuxss_eml_settings_export() {
     if ( ! isset( $_POST['eml-settings-export'] ) )
         return;
 
-    if ( ! wp_verify_nonce( $_POST['eml-settings-export-nonce'], 'eml_settings_export_nonce' ) )
+    if ( ! isset( $_POST['eml-settings-export-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['eml-settings-export-nonce'] ) ), 'eml_settings_export_nonce' ) )
         return;
 
     if ( ! current_user_can( 'manage_options' ) )
@@ -1268,7 +1268,7 @@ function wpuxss_eml_settings_import() {
     if ( ! isset( $_POST['eml-settings-import'] ) )
         return;
 
-    if ( ! wp_verify_nonce( $_POST['eml-settings-import-nonce'], 'eml_settings_import_nonce' ) )
+    if ( ! isset( $_POST['eml-settings-import-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['eml-settings-import-nonce'] ) ), 'eml_settings_import_nonce' ) )
         return;
 
     if ( ! current_user_can( 'manage_options' ) )
@@ -1348,7 +1348,7 @@ function wpuxss_eml_settings_restoring() {
     if ( ! isset( $_POST['eml-settings-restore'] ) )
         return;
 
-    if ( ! wp_verify_nonce( $_POST['eml-settings-restore-nonce'], 'eml_settings_restore_nonce' ) )
+    if ( ! isset( $_POST['eml-settings-restore-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['eml-settings-restore-nonce'] ) ), 'eml_settings_restore_nonce' ) )
         return;
 
     if ( ! current_user_can( 'manage_options' ) )
@@ -1398,7 +1398,7 @@ function wpuxss_eml_settings_cleanup() {
     if ( ! isset( $_POST['eml-settings-cleanup'] ) )
         return;
 
-    if ( ! wp_verify_nonce( $_POST['eml-settings-cleanup-nonce'], 'eml_settings_cleanup_nonce' ) )
+    if ( ! isset( $_POST['eml-settings-cleanup-nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash( $_POST['eml-settings-cleanup-nonce'] ) ), 'eml_settings_cleanup_nonce' ) )
         return;
 
     if ( ! current_user_can( 'manage_options' ) )
@@ -1460,7 +1460,7 @@ function wpuxss_eml_term_relationship_cleanup() {
 
     foreach ( get_option( 'wpuxss_eml_taxonomies', array() ) as $taxonomy => $params ) {
 
-        $terms = get_terms( $taxonomy, array( 'fields' => 'all', 'get' => 'all' ) );
+        $terms = get_terms( array( 'taxonomy' => $taxonomy, 'fields' => 'all', 'get' => 'all' ) );
         $term_pairs = wpuxss_eml_get_media_term_pairs( $terms, 'id=>tt_id' );
 
         if ( (bool) $params['eml_media'] ) {
@@ -2956,7 +2956,10 @@ function wpuxss_eml_admin_notice_dismiss() {
     check_ajax_referer( 'eml-admin-notice-nonce', 'nonce' );
 
 
-    $notice_id = sanitize_text_field( $_POST['notice_id'] );
+    if ( ! isset( $_POST['notice_id'] ) )
+        wp_send_json_error();
+
+    $notice_id = sanitize_text_field( wp_unslash( $_POST['notice_id'] ) );
     $user_id = get_current_user_id();
 
     update_user_meta( $user_id, "wpuxss_eml_{$notice_id}_notice_dismissed", true );

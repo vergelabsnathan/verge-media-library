@@ -1,0 +1,25 @@
+{
+	"$schema": "https://playground.wordpress.net/blueprint-schema.json",
+	"landingPage": "/wp-admin/upload.php?mode=grid",
+	"preferredVersions": {
+		"php": "8.3",
+		"wp": "latest"
+	},
+	"login": true,
+	"steps": [
+		{
+			"step": "installPlugin",
+			"pluginData": {
+				"resource": "url",
+				"url": "https://raw.githubusercontent.com/vergelabsnathan/verge-media-library/main/playground/verge-media-library.zip"
+			},
+			"options": {
+				"activate": true
+			}
+		},
+		{
+			"step": "runPHP",
+			"code": "<?php require_once '/wordpress/wp-load.php'; foreach ( array('Photos','Logos','Icons','Screenshots') as $t ) { if ( ! term_exists( $t, 'media_category' ) ) { wp_insert_term( $t, 'media_category' ); } } $u = get_users( array( 'number' => 1, 'role' => 'editor' ) ); if ( ! $u ) { wp_insert_user( array( 'user_login' => 'editor', 'user_pass' => wp_generate_password(), 'role' => 'editor', 'display_name' => 'Second Author' ) ); } $terms = get_terms( array( 'taxonomy' => 'media_category', 'hide_empty' => false ) ); $dir = wp_upload_dir(); for ( $i = 1; $i <= 8; $i++ ) { $im = imagecreatetruecolor( 480, 320 ); imagefill( $im, 0, 0, imagecolorallocate( $im, 40 + $i * 22, 90, 170 ) ); $path = trailingslashit( $dir['path'] ) . 'sample-' . $i . '.png'; imagepng( $im, $path ); imagedestroy( $im ); $id = wp_insert_attachment( array( 'post_title' => 'Sample image ' . $i, 'post_mime_type' => 'image/png', 'post_status' => 'inherit' ), $path ); require_once ABSPATH . 'wp-admin/includes/image.php'; wp_update_attachment_metadata( $id, wp_generate_attachment_metadata( $id, $path ) ); if ( ! empty( $terms ) && ! is_wp_error( $terms ) ) { wp_set_object_terms( $id, array( (int) $terms[ $i % count( $terms ) ]->term_id ), 'media_category' ); } } $o = get_option( 'vergeml_lib_options', array() ); $o['filters_to_show'] = array( 'types', 'dates', 'taxonomies', 'authors' ); update_option( 'vergeml_lib_options', $o );"
+		}
+	]
+}

@@ -1,0 +1,5 @@
+# Keep development-only files out of the release archive built by git archive.
+/.gitattributes   export-ignore
+/.gitignore       export-ignore
+/.wp-env.json     export-ignore
+/.release-assets  export-ignore

@@ -49,15 +49,21 @@ Worth knowing before touching any of this: on `upload.php` the frame is
 `mode-eml-grid`, not core's `mode-grid`. The mode is set in JavaScript, so grepping the
 PHP for `eml-grid` finds nothing and it is easy to conclude the mode is PRO-only. It is not.
 
-Consequences, all pre-existing and all upstream behaviour:
+Consequences:
 
-- core's grid branch in `createToolbar` never runs, so **core's "Bulk select" and "Delete
-  selected" buttons do not exist** on the media grid under this plugin, though they do on
-  stock WordPress
+- core's grid branch in `createToolbar` does not run on its own, so core's **Bulk select**
+  and **Delete selected** buttons were missing entirely. Fixed: `createToolbar` borrows
+  `grid` for the duration of core's call and hands it back.
 - the view switcher has to be supplied by us, because core only adds it in its own grid mode
 
-Restoring core's bulk-select is a candidate fix now that the wrap is in place, but it is a
-behaviour change and belongs in its own commit.
+**Do not declare `grid` permanently.** It was tried. It pulls in core's grid stylesheet,
+which hides the individual filter labels behind the screen-reader heading — core's design,
+not this plugin's — collapsing the filter row into stacked columns and taking the toolbar
+from 66px to 96px. Borrowing the mode gets core's buttons without the restyle.
+
+Priorities matter here too. Core files Bulk select at `-70`; our filters run from `-75`
+upward in fractional steps so they sort before it and the button lands after the filter run
+instead of between two dropdowns.
 
 ### Conversions
 

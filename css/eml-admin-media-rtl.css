@@ -551,3 +551,80 @@ body.eml-media-css .media-frame .spinner {
 body.eml-media-css .media-menu .media-menu-item.hidden {
     display: none !important;
 }
+
+
+
+/* == Media Toolbar :: WordPress 7.0+ == */
+
+/*  WP 7.0 changed .media-toolbar-secondary in wp-includes/css/media-views.css
+    from inline-block flow to a fixed CSS Grid:
+
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(2, 1fr);
+
+    with explicit grid-area placement for the two core filters only. This
+    plugin puts more children in the same container -- author and taxonomy
+    filter pairs, "Reset All Filters", search, bulk buttons, the spinner --
+    and none of them have a grid-area, so they fall into implicit
+    auto-placement and stack onto extra rows below the toolbar.
+
+    Two rows of column flow instead of a fixed 2x2: row 1 holds labels,
+    row 2 holds controls, and any number of pairs lines up the way core's
+    two do. Anything that is not half of a pair takes a full column.
+
+    Direction-neutral on purpose -- "start" and column-gap follow the
+    document direction, so this block is identical in the LTR stylesheet. */
+
+body.eml-media-css .media-toolbar-secondary {
+    display: grid;
+    grid-auto-flow: column;
+    grid-template-columns: none;
+    grid-template-rows: auto auto;
+    grid-auto-columns: minmax(0, max-content);
+    justify-content: start;
+    align-items: end;
+    column-gap: 12px;
+    row-gap: 0;
+    max-width: none;
+    width: auto;
+}
+
+/* core pins its own two filters to fixed cells; release them into the flow */
+body.eml-media-css .media-toolbar-secondary > label,
+body.eml-media-css .media-toolbar-secondary > select {
+    grid-area: auto;
+}
+
+body.eml-media-css .media-toolbar-secondary > .media-button,
+body.eml-media-css .media-toolbar-secondary > .spinner,
+body.eml-media-css .media-toolbar-secondary > .search,
+body.eml-media-css .media-toolbar-secondary > .view-switch,
+body.eml-media-css .media-toolbar-secondary > .media-selection {
+    grid-row: 1 / -1;
+    align-self: end;
+}
+
+/* the pre-7.0 rules above spaced these by hand for inline-block flow */
+body.eml-media-css .media-toolbar-secondary > .media-button,
+body.eml-media-css .media-toolbar-secondary .search {
+    margin-top: 0;
+}
+
+@media screen and (max-width: 782px) {
+
+    body.eml-media-css .media-toolbar-secondary {
+        grid-auto-flow: row;
+        grid-template-rows: none;
+        grid-auto-columns: auto;
+        row-gap: 8px;
+    }
+
+    body.eml-media-css .media-toolbar-secondary > .media-button,
+    body.eml-media-css .media-toolbar-secondary > .spinner,
+    body.eml-media-css .media-toolbar-secondary > .search,
+    body.eml-media-css .media-toolbar-secondary > .view-switch,
+    body.eml-media-css .media-toolbar-secondary > .media-selection {
+        grid-row: auto;
+    }
+}

@@ -1877,48 +1877,23 @@ function vergeml_print_media_library_options() {
 
 
                         <?php
-                            $class_name = defined( 'EML_IS_PRO' ) ? '' : ' disabled';
-                            $class = defined( 'EML_IS_PRO' ) ? '' : ' class="disabled"';
-                            $disabled = defined( 'EML_IS_PRO' ) ? '' : ' readonly="readonly"';
-                            $pro_message = defined( 'EML_IS_PRO' ) ? '' : ' <span class="premium">/ Premium Feature</span>';
+                            /*
+                             *  This whole box used to be greyed out and labelled
+                             *  "/ Premium Feature", even though search on enter, the
+                             *  minimum letter count and auto search all work here. Only
+                             *  the "Enable search in" fieldset was genuinely paid-only,
+                             *  and its option was stored but never read, so that one
+                             *  fieldset is gone and the rest is simply enabled.
+                             */
                         ?>
 
-                        <h2<?php echo $class; ?>><?php esc_html_e('Search','verge-media-library'); echo $pro_message; ?></h2>
+                        <h2><?php esc_html_e( 'Search', 'verge-media-library' ); ?></h2>
 
-                        <div class="postbox<?php echo $class_name; ?>">
+                        <div class="postbox">
 
                             <div class="inside">
 
                                 <table class="form-table">
-
-                                    <tr>
-                                        <th scope="row"><?php esc_html_e('Enable search in','verge-media-library'); ?></th>
-                                        <td>
-                                            <fieldset id="vergeml_lib_options_search_in">
-                                                <legend class="screen-reader-text"><span><?php esc_html_e('Enable search in', 'verge-media-library'); ?></span></legend>
-                                                <input name="vergeml_lib_options[search_in][]" type="hidden" value="none" />
-                                                
-                                                <label><input name="vergeml_lib_options[search_in][]" type="checkbox" value="titles" class="search_columns" <?php echo in_array('titles', $vergeml_lib_options['search_in']) ? 'checked' : ''; echo $disabled; ?> /> <?php esc_html_e('Titles','verge-media-library'); ?></label><br />
-                                                <label><input name="vergeml_lib_options[search_in][]" type="checkbox" value="captions" class="search_columns" <?php echo in_array('captions', $vergeml_lib_options['search_in']) ? 'checked' : '';  echo $disabled; ?> /> <?php esc_html_e('Captions','verge-media-library'); ?></label><br />
-                                                <label><input name="vergeml_lib_options[search_in][]" type="checkbox" value="descriptions" class="search_columns" <?php echo in_array('descriptions', $vergeml_lib_options['search_in']) ? 'checked' : ''; echo $disabled; ?> /> <?php esc_html_e('Descriptions','verge-media-library'); ?></label>
-                                                <p class="description"><?php esc_html_e('One of the three above must be ON due to WP core limitations.','verge-media-library'); ?></p>
-                                                <br />
-
-                                                <label><input name="vergeml_lib_options[search_in][]" type="checkbox" value="filenames" <?php echo in_array('filenames', $vergeml_lib_options['search_in']) ? 'checked' : ''; echo $disabled; ?> /> <?php esc_html_e('Filenames','verge-media-library'); ?></label><br />
-
-                                                <label><input name="vergeml_lib_options[search_in][]" type="checkbox" value="authors" <?php echo in_array('authors', $vergeml_lib_options['search_in']) ? 'checked' : ''; echo $disabled; ?> /> <?php esc_html_e('Authors','verge-media-library'); ?></label><br />
-                                                <label><input name="vergeml_lib_options[search_in][]" type="checkbox" value="taxonomies" <?php echo in_array('taxonomies', $vergeml_lib_options['search_in']) ? 'checked' : ''; echo $disabled; ?> /> <?php esc_html_e('Media Taxonomies','verge-media-library'); ?></label>
-                                                <p class="description"><?php esc_html_e('Enhance default search in Media Library and Media Popups.','verge-media-library'); ?></p>
-                                                <p class="description"><?php esc_html_e('By default, WordPress looks into filenames, titles, captions, and descriptions.','verge-media-library'); ?></p>
-                                                <p class="description"><?php
-                                                printf(
-                                                    '<strong style="color:blue">%s!</strong> %s',
-                                                    __( 'Note', 'verge-media-library' ),
-                                                    __( 'The fewer options, the faster search.', 'verge-media-library' )
-                                                ); ?></p>
-                                            </fieldset>
-                                        </td>
-                                    </tr>
 
                                     <tr>
                                         <th scope="row"><?php esc_html_e('Search on enter','verge-media-library'); ?></th>
@@ -2362,32 +2337,15 @@ function vergeml_print_taxonomies_options() {
                                                 $html .= '<li><input type="checkbox" class="vergeml-media_uploader_filter" name="vergeml_taxonomies[' . esc_attr($taxonomy->name) . '][media_uploader_filter]" id="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-media_uploader_filter" value="1" ' . checked( true, (bool) $vergeml_taxonomies[$taxonomy->name]['media_uploader_filter'], false ) . ' /><label for="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-media_uploader_filter">' . __('Filter for Grid View / Media Popup','verge-media-library') . '</label></li>';
                                                 $html .= '<li><input type="checkbox" class="vergeml-media_popup_taxonomy_edit" name="vergeml_taxonomies[' . esc_attr($taxonomy->name) . '][media_popup_taxonomy_edit]" id="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-media_popup_taxonomy_edit" value="1" ' . checked( true, (bool) $vergeml_taxonomies[$taxonomy->name]['media_popup_taxonomy_edit'], false ) . ' /><label for="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-media_popup_taxonomy_edit">' . __('Edit in Media Popup','verge-media-library') . '</label></li>';
 
-                                                $class = defined( 'EML_IS_PRO' ) ? '' : ' class="disabled"';
-                                                $class_name = defined( 'EML_IS_PRO' ) ? '' : ' disabled';
-                                                $disabled = defined( 'EML_IS_PRO' ) ? '' : ' readonly="readonly"';
-                                                $pro_message = defined( 'EML_IS_PRO' ) ? '' : ' <span class="premium disabled">/ Premium Feature</span>';
-                                                $post_singular_name = strtolower ( $post_type->labels->singular_name );
-
-                                                $html .= $pro_message;
-                                                $html .= '<li' . $class . '><input type="checkbox" class="vergeml-taxonomy_auto_assign" name="vergeml_taxonomies[' . esc_attr($taxonomy->name) . '][taxonomy_auto_assign]" id="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-taxonomy_auto_assign" value="1" ' . checked( true, (bool) $vergeml_taxonomies[$taxonomy->name]['taxonomy_auto_assign'], false ) . $disabled . ' />';
-                                                $html .= '<label for="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-taxonomy_auto_assign">' . sprintf(
-                                                    __('Auto-assign media items to parent %s %s on upload','verge-media-library'),
-                                                    esc_html($post_singular_name),
-                                                    esc_html($taxonomy->label)
-                                                ) . '</label>
-                                                <a class="add-new-h2 eml-button-synchronize-terms' . $class_name . '" data-post-type="' . esc_attr($post_type->name) . '" data-taxonomy="' . esc_attr($taxonomy->name) . '" href="javascript:;">' . __( 'Synchronize Now', 'verge-media-library' ) . '</a><p class="description">';
-                                                $html .= sprintf(
-                                                    '<strong style="color:red">%s:</strong> ',
-                                                    __('Warning','verge-media-library')
-                                                );
-                                                $html .= sprintf(
-                                                    __('As a result of clicking "Synchronize Now" all media items attached to a %s will be assigned to %s of their parent %s. Currently assigned %s will not be saved. Media items that are not attached to any %s will not be affected.','verge-media-library'),
-                                                    esc_html($post_singular_name),
-                                                    esc_html($taxonomy->label),
-                                                    esc_html($post_singular_name),
-                                                    esc_html($taxonomy->label),
-                                                    esc_html($post_singular_name)
-                                                ) . '</p></li>';
+                                                /*
+                                                 *  An "Auto-assign media items to parent" checkbox and a
+                                                 *  "Synchronize Now" button sat here, permanently greyed
+                                                 *  out and labelled "/ Premium Feature". Neither did
+                                                 *  anything: taxonomy_auto_assign was stored but never
+                                                 *  read, and the synchronise request had no handler on
+                                                 *  this side. Both belong to the paid add-on, so they are
+                                                 *  gone rather than shipped as locked teasers.
+                                                 */
 
                                                 $html .= '</ul>';
 
@@ -2451,37 +2409,16 @@ function vergeml_print_taxonomies_options() {
 
                         </div>
 
-                        <?php 
-                            $class_name = defined( 'EML_IS_PRO' ) ? '' : ' disabled';
-                            $class = defined( 'EML_IS_PRO' ) ? '' : ' class="disabled"';
-                            $disabled = defined( 'EML_IS_PRO' ) ? '' : ' readonly="readonly"';
-                            $pro_message = defined( 'EML_IS_PRO' ) ? '' : ' <span class="premium">/ Premium Feature</span>';
+                        <?php
+                            /*
+                             *  A "Bulk Edit" settings box used to sit here, permanently
+                             *  greyed out and labelled "/ Premium Feature". Its one
+                             *  option, bulk_edit_save_button, was stored and validated
+                             *  but never read by anything in this plugin: the behaviour
+                             *  lived in the paid add-on. Removed rather than shipped as
+                             *  a locked teaser for a product this is not.
+                             */
                         ?>
-
-                        <h2<?php echo $class; ?>><?php esc_html_e('Bulk Edit','verge-media-library');  echo $pro_message; ?></h2>
-
-                        <div class="postbox<?php echo $class_name; ?>">
-
-                            <div class="inside">
-
-                                <table class="form-table">
-                                    <tr>
-                                        <th scope="row"><?php esc_html_e('Save Changes button','verge-media-library'); ?></th>
-                                        <td>
-                                            <fieldset>
-                                                <legend class="screen-reader-text"><span><?php esc_html_e('Turn off \'Save Changes\' button','verge-media-library'); ?></span></legend>
-                                                <label><input name="vergeml_tax_options[bulk_edit_save_button]" type="hidden" value="0"><input name="vergeml_tax_options[bulk_edit_save_button]" type="checkbox" value="1" <?php checked( true, (bool) $vergeml_tax_options['bulk_edit_save_button'], true ); echo $disabled; ?> /> <?php esc_html_e('Bulk changes are being made not immediately - by clicking \'Save Changes\' button','verge-media-library'); ?></label>
-                                                <p class="description"><?php esc_html_e( 'Try this if you edit a lot of media items at once and feel uncomfortable with editing saved on the fly.', 'verge-media-library' ); ?></p>
-                                            </fieldset>
-                                        </td>
-                                    </tr>
-                                </table>
-
-                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings-bulk-edit' ) ); ?>
-
-                            </div>
-
-                        </div>
 
                     </form>
 

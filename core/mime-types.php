@@ -116,10 +116,27 @@ function vergeml_post_mime_types( $post_mime_types ) {
 
             $mime_type = sanitize_mime_type( $type_array['mime'] );
 
-            $post_mime_types[$mime_type] = array(
+            /*
+             *  The singular and plural here are labels the site owner typed on
+             *  the MIME Types screen, so they cannot be extracted for
+             *  translation and _n_noop() has nothing to look up. Build the same
+             *  array _n_noop() would return, so translate_nooped_plural() still
+             *  works on it, without pretending the label is a known string.
+             */
+
+            $post_mime_types[ $mime_type ] = array(
                 esc_html( $type_array['plural'] ),
-                'Manage ' . esc_html( $type_array['plural'] ),
-                _n_noop( esc_html( $type_array['singular'] ) . ' <span class="count">(%s)</span>', esc_html( $type_array['plural'] ) . ' <span class="count">(%s)</span>' )
+                sprintf(
+                    /* translators: %s: plural name of a file type, for example "Images" */
+                    esc_html__( 'Manage %s', 'verge-media-library' ),
+                    esc_html( $type_array['plural'] )
+                ),
+                array(
+                    'singular' => esc_html( $type_array['singular'] ) . ' <span class="count">(%s)</span>',
+                    'plural'   => esc_html( $type_array['plural'] ) . ' <span class="count">(%s)</span>',
+                    'context'  => null,
+                    'domain'   => 'verge-media-library',
+                )
             );
         }
     }

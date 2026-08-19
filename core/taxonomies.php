@@ -349,7 +349,7 @@ function vergeml_restrict_manage_posts( $post_type, $which ) {
 
     if ( current_user_can( 'manage_options' ) && in_array( 'authors', $vergeml_lib_options['filters_to_show'] ) ) {
 
-        echo "<label for='author' class='screen-reader-text'>" . __('Filter by author','verge-media-library') . "</label>";
+        echo "<label for='author' class='screen-reader-text'>" . esc_html__( 'Filter by author', 'verge-media-library' ) . "</label>";
 
         wp_dropdown_users(
             array(
@@ -370,7 +370,7 @@ function vergeml_restrict_manage_posts( $post_type, $which ) {
             if ( ! (bool) $vergeml_taxonomies[$taxonomy->name]['admin_filter'] )
                 continue;
 
-            echo "<label for='" . esc_attr($taxonomy->name) ."' class='screen-reader-text'>" . __('Filter by','verge-media-library') . " " . esc_html($taxonomy->labels->name) . "</label>";
+            echo "<label for='" . esc_attr( $taxonomy->name ) . "' class='screen-reader-text'>" . esc_html__( 'Filter by', 'verge-media-library' ) . ' ' . esc_html( $taxonomy->labels->name ) . "</label>";
 
             $selected = ( ! $uncategorized && isset( $wp_query->query[$taxonomy->name] ) ) ? $wp_query->query[$taxonomy->name] : 0;
 
@@ -698,10 +698,11 @@ function vergeml_attachment_fields_to_edit( $form_fields, $post ) {
                 else {
 
                     $not_found = sprintf(
+                        /* translators: %s: name of a taxonomy, for example "Media Categories" */
                         esc_html__( 'No %s found.', 'verge-media-library' ),
-                        esc_html($t['label'])
+                        esc_html( $t['label'] )
                     );
-                    $html = '<ul class="term-list"><li>' . $not_found .' <a href="' . admin_url('/edit-tags.php?taxonomy='.$taxonomy.'&post_type=attachment') . '">' . __('Add some', 'verge-media-library') . '.</a></li></ul>';
+                    $html = '<ul class="term-list"><li>' . $not_found . ' <a href="' . esc_url( admin_url( '/edit-tags.php?taxonomy=' . $taxonomy . '&post_type=attachment' ) ) . '">' . esc_html__( 'Add some', 'verge-media-library' ) . '.</a></li></ul>';
                 }
 
             ob_end_clean();
@@ -1260,14 +1261,30 @@ function vergeml_update_post_term_count( $terms, $taxonomy ) {
         unset( $object_types[ $check_attachments ] );
 
     if ( $object_types )
-        $object_types = esc_sql( array_filter( $object_types, 'post_type_exists' ) );
+        $object_types = array_values( array_filter( $object_types, 'post_type_exists' ) );
 
     foreach ( (array) $terms as $term ) {
 
         $count = 0;
 
-        if ( $object_types )
-            $count += (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts WHERE $wpdb->posts.ID = $wpdb->term_relationships.object_id AND post_status = 'publish' AND post_type IN ('" . implode("', '", $object_types ) . "') AND term_taxonomy_id = %d", $term ) );
+        if ( $object_types ) {
+
+            /*
+             *  Post types are placeheld rather than quoted into the string, so
+             *  there is nothing left to escape by hand. Table names come from
+             *  $wpdb and are not input, which is why they stay interpolated.
+             */
+
+            $placeholders = implode( ', ', array_fill( 0, count( $object_types ), '%s' ) );
+
+            $count += (int) $wpdb->get_var(
+                $wpdb->prepare(
+                    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names are from $wpdb, every value is placeheld.
+                    "SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts WHERE $wpdb->posts.ID = $wpdb->term_relationships.object_id AND post_status = 'publish' AND post_type IN ( $placeholders ) AND term_taxonomy_id = %d",
+                    array_merge( $object_types, array( $term ) )
+                )
+            ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- term counts are recalculated on demand; caching them would serve stale counts.
+        }
 
         do_action( 'edit_term_taxonomy', $term, $taxonomy->name );
         $wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );

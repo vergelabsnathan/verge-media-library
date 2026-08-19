@@ -45,24 +45,58 @@ function vergeml_register_setting() {
     );
 
     // plugin settings: network settings
-    // no validation callback here
-    // called explicitly in vergeml_update_network_settings
+    // validated explicitly in vergeml_update_network_settings; the callback
+    // below is the generic guard for anything arriving via the Settings API
     register_setting(
         'eml-network-settings', //option_group
-        'vergeml_network_options' //option_name
+        'vergeml_network_options', //option_name
+        'vergeml_sanitize_option_array' //sanitize_callback
     );
 
     // plugin settings: all settings backup before import
     register_setting(
         'vergeml_backup', //option_group
-        'vergeml_backup' //option_name
+        'vergeml_backup', //option_name
+        'vergeml_sanitize_option_array' //sanitize_callback
     );
 
     // plugin settings: remote admin notices
     register_setting(
         'vergeml_notices', //option_group
-        'vergeml_notices' //option_name
+        'vergeml_notices', //option_name
+        'vergeml_sanitize_option_array' //sanitize_callback
     );
+}
+
+
+
+/**
+ *  vergeml_sanitize_option_array
+ *
+ *  Generic sanitiser for the option groups that carry no validation callback of
+ *  their own. Walks the array and runs every string through
+ *  sanitize_text_field, leaving structure and scalar types alone so stored
+ *  integers and booleans do not come back as strings.
+ *
+ *  These three options are normally written with update_option rather than
+ *  through options.php, so in practice this runs only if something posts them
+ *  via the Settings API.
+ *
+ *  @since    2.9.8
+ */
+
+function vergeml_sanitize_option_array( $value ) {
+
+    if ( is_array( $value ) ) {
+        return array_map( 'vergeml_sanitize_option_array', $value );
+    }
+
+    if ( is_string( $value ) ) {
+        return sanitize_text_field( $value );
+    }
+
+    // int, float, bool and null are already safe to store as they are
+    return $value;
 }
 
 
@@ -336,10 +370,10 @@ function vergeml_media_options_page() {
 function vergeml_print_media_settings_tabs( $active ) { ?>
 
     <h2 class="nav-tab-wrapper wp-clearfix" id="eml-options-media-tabs">
-        <a href="<?php echo get_admin_url( null, 'options-general.php?page=media' ); ?>" class="nav-tab<?php echo ( 'media' == $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'General', 'verge-media-library' ); ?></a>
-        <a href="<?php echo get_admin_url( null, 'options-general.php?page=media-library' ); ?>" class="nav-tab<?php echo ( 'library' == $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'Media Library', 'verge-media-library' ); ?></a>
-        <a href="<?php echo get_admin_url( null, 'options-general.php?page=media-taxonomies' ); ?>" class="nav-tab<?php echo ( 'taxonomies' == $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'Media Taxonomies', 'verge-media-library' ); ?></a>
-        <a href="<?php echo get_admin_url( null, 'options-general.php?page=mime-types' ); ?>" class="nav-tab<?php echo ( 'mimetypes' == $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'MIME Types', 'verge-media-library' ); ?></a>
+        <a href="<?php echo esc_url( get_admin_url( null, 'options-general.php?page=media' ) ); ?>" class="nav-tab<?php echo ( 'media' === $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'General', 'verge-media-library' ); ?></a>
+        <a href="<?php echo esc_url( get_admin_url( null, 'options-general.php?page=media-library' ) ); ?>" class="nav-tab<?php echo ( 'library' === $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'Media Library', 'verge-media-library' ); ?></a>
+        <a href="<?php echo esc_url( get_admin_url( null, 'options-general.php?page=media-taxonomies' ) ); ?>" class="nav-tab<?php echo ( 'taxonomies' === $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'Media Taxonomies', 'verge-media-library' ); ?></a>
+        <a href="<?php echo esc_url( get_admin_url( null, 'options-general.php?page=mime-types' ) ); ?>" class="nav-tab<?php echo ( 'mimetypes' === $active ) ? ' nav-tab-active' : ''; ?>"><?php esc_html_e( 'MIME Types', 'verge-media-library' ); ?></a>
     </h2>
 
 <?php
@@ -359,20 +393,20 @@ function vergeml_print_media_settings_tabs( $active ) { ?>
 function vergeml_print_media_settings() {
 
     if ( ! current_user_can( 'manage_options' ) )
-        wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
 
     if ( is_multisite() ) {
 
         $vergeml_network_options = get_site_option( 'vergeml_network_options', array() );
 
         if ( ! current_user_can( 'manage_network_options' ) && ! (bool) $vergeml_network_options['media_settings'] )
-            wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
     }
 
     settings_errors();
 
 
-    $title = __('Media Settings');
+    $title = __( 'Media Settings', 'verge-media-library' );
     ?>
 
     <div class="wrap">
@@ -383,57 +417,57 @@ function vergeml_print_media_settings() {
     <form action="options.php" method="post">
     <?php settings_fields( 'media' ); ?>
 
-    <h2 class="title"><?php esc_html_e( 'Image sizes' ); ?></h2>
-    <p><?php esc_html_e( 'The sizes listed below determine the maximum dimensions in pixels to use when adding an image to the Media Library.' ); ?></p>
+    <h2 class="title"><?php esc_html_e( 'Image sizes', 'verge-media-library' ); ?></h2>
+    <p><?php esc_html_e( 'The sizes listed below determine the maximum dimensions in pixels to use when adding an image to the Media Library.', 'verge-media-library' ); ?></p>
 
     <table class="form-table" role="presentation">
     <tr>
-    <th scope="row"><?php esc_html_e( 'Thumbnail size' ); ?></th>
+    <th scope="row"><?php esc_html_e( 'Thumbnail size', 'verge-media-library' ); ?></th>
     <td><fieldset><legend class="screen-reader-text"><span>
         <?php
         /* translators: Hidden accessibility text. */
-        esc_html_e( 'Thumbnail size' );
+        esc_html_e( 'Thumbnail size', 'verge-media-library' );
         ?>
     </span></legend>
-    <label for="thumbnail_size_w"><?php esc_html_e( 'Width' ); ?></label>
+    <label for="thumbnail_size_w"><?php esc_html_e( 'Width', 'verge-media-library' ); ?></label>
     <input name="thumbnail_size_w" type="number" step="1" min="0" id="thumbnail_size_w" value="<?php form_option( 'thumbnail_size_w' ); ?>" class="small-text" />
     <br />
-    <label for="thumbnail_size_h"><?php esc_html_e( 'Height' ); ?></label>
+    <label for="thumbnail_size_h"><?php esc_html_e( 'Height', 'verge-media-library' ); ?></label>
     <input name="thumbnail_size_h" type="number" step="1" min="0" id="thumbnail_size_h" value="<?php form_option( 'thumbnail_size_h' ); ?>" class="small-text" />
     </fieldset>
     <input name="thumbnail_crop" type="checkbox" id="thumbnail_crop" value="1" <?php checked( '1', get_option( 'thumbnail_crop' ) ); ?>/>
-    <label for="thumbnail_crop"><?php esc_html_e( 'Crop thumbnail to exact dimensions (normally thumbnails are proportional)' ); ?></label>
+    <label for="thumbnail_crop"><?php esc_html_e( 'Crop thumbnail to exact dimensions (normally thumbnails are proportional)', 'verge-media-library' ); ?></label>
     </td>
     </tr>
 
     <tr>
-    <th scope="row"><?php esc_html_e( 'Medium size' ); ?></th>
+    <th scope="row"><?php esc_html_e( 'Medium size', 'verge-media-library' ); ?></th>
     <td><fieldset><legend class="screen-reader-text"><span>
         <?php
         /* translators: Hidden accessibility text. */
-        esc_html_e( 'Medium size' );
+        esc_html_e( 'Medium size', 'verge-media-library' );
         ?>
     </span></legend>
-    <label for="medium_size_w"><?php esc_html_e( 'Max Width' ); ?></label>
+    <label for="medium_size_w"><?php esc_html_e( 'Max Width', 'verge-media-library' ); ?></label>
     <input name="medium_size_w" type="number" step="1" min="0" id="medium_size_w" value="<?php form_option( 'medium_size_w' ); ?>" class="small-text" />
     <br />
-    <label for="medium_size_h"><?php esc_html_e( 'Max Height' ); ?></label>
+    <label for="medium_size_h"><?php esc_html_e( 'Max Height', 'verge-media-library' ); ?></label>
     <input name="medium_size_h" type="number" step="1" min="0" id="medium_size_h" value="<?php form_option( 'medium_size_h' ); ?>" class="small-text" />
     </fieldset></td>
     </tr>
 
     <tr>
-    <th scope="row"><?php esc_html_e( 'Large size' ); ?></th>
+    <th scope="row"><?php esc_html_e( 'Large size', 'verge-media-library' ); ?></th>
     <td><fieldset><legend class="screen-reader-text"><span>
         <?php
         /* translators: Hidden accessibility text. */
-        esc_html_e( 'Large size' );
+        esc_html_e( 'Large size', 'verge-media-library' );
         ?>
     </span></legend>
-    <label for="large_size_w"><?php esc_html_e( 'Max Width' ); ?></label>
+    <label for="large_size_w"><?php esc_html_e( 'Max Width', 'verge-media-library' ); ?></label>
     <input name="large_size_w" type="number" step="1" min="0" id="large_size_w" value="<?php form_option( 'large_size_w' ); ?>" class="small-text" />
     <br />
-    <label for="large_size_h"><?php esc_html_e( 'Max Height' ); ?></label>
+    <label for="large_size_h"><?php esc_html_e( 'Max Height', 'verge-media-library' ); ?></label>
     <input name="large_size_h" type="number" step="1" min="0" id="large_size_h" value="<?php form_option( 'large_size_h' ); ?>" class="small-text" />
     </fieldset></td>
     </tr>
@@ -447,14 +481,14 @@ function vergeml_print_media_settings() {
      */
     if ( isset( $GLOBALS['wp_settings']['media']['embeds'] ) ) :
         ?>
-    <h2 class="title"><?php esc_html_e( 'Embeds' ); ?></h2>
+    <h2 class="title"><?php esc_html_e( 'Embeds', 'verge-media-library' ); ?></h2>
     <table class="form-table" role="presentation">
         <?php do_settings_fields( 'media', 'embeds' ); ?>
     </table>
     <?php endif; ?>
 
     <?php if ( ! is_multisite() ) : ?>
-    <h2 class="title"><?php esc_html_e( 'Uploading Files' ); ?></h2>
+    <h2 class="title"><?php esc_html_e( 'Uploading Files', 'verge-media-library' ); ?></h2>
     <table class="form-table" role="presentation">
         <?php
         /*
@@ -466,21 +500,21 @@ function vergeml_print_media_settings() {
             || get_option( 'upload_path' ) && 'wp-content/uploads' !== get_option( 'upload_path' ) ) :
             ?>
     <tr>
-    <th scope="row"><label for="upload_path"><?php esc_html_e( 'Store uploads in this folder' ); ?></label></th>
+    <th scope="row"><label for="upload_path"><?php esc_html_e( 'Store uploads in this folder', 'verge-media-library' ); ?></label></th>
     <td><input name="upload_path" type="text" id="upload_path" value="<?php echo esc_attr( get_option( 'upload_path' ) ); ?>" class="regular-text code" />
     <p class="description">
             <?php
             /* translators: %s: wp-content/uploads */
-            printf( __( 'Default is %s' ), '<code>wp-content/uploads</code>' );
+            printf( esc_html__( 'Default is %s', 'verge-media-library' ), '<code>wp-content/uploads</code>' );
             ?>
     </p>
     </td>
     </tr>
 
     <tr>
-    <th scope="row"><label for="upload_url_path"><?php esc_html_e( 'Full URL path to files' ); ?></label></th>
+    <th scope="row"><label for="upload_url_path"><?php esc_html_e( 'Full URL path to files', 'verge-media-library' ); ?></label></th>
     <td><input name="upload_url_path" type="text" id="upload_url_path" value="<?php echo esc_attr( get_option( 'upload_url_path' ) ); ?>" class="regular-text code" />
-    <p class="description"><?php esc_html_e( 'Configuring this is optional. By default, it should be blank.' ); ?></p>
+    <p class="description"><?php esc_html_e( 'Configuring this is optional. By default, it should be blank.', 'verge-media-library' ); ?></p>
     </td>
     </tr>
     <tr>
@@ -491,7 +525,7 @@ function vergeml_print_media_settings() {
     <?php endif; ?>
     <label for="uploads_use_yearmonth_folders">
     <input name="uploads_use_yearmonth_folders" type="checkbox" id="uploads_use_yearmonth_folders" value="1"<?php checked( '1', get_option( 'uploads_use_yearmonth_folders' ) ); ?> />
-        <?php esc_html_e( 'Organize my uploads into month- and year-based folders' ); ?>
+        <?php esc_html_e( 'Organize my uploads into month- and year-based folders', 'verge-media-library' ); ?>
     </label>
     </td>
     </tr>
@@ -684,16 +718,19 @@ function vergeml_options_page_scripts() {
         'apply_to_network_nonce' => wp_create_nonce( 'eml-apply-to-network-nonce' ),
         'applying_settings_title' => __( 'Unify Media Settings over Network', 'verge-media-library' ),
         'applying_media_library_settings_text' => sprintf(
-            'ALL Media Library Settings on the Network %s with the settings of the main website.',
-            '<strong style="text-transform:uppercase">' . __( 'will be overwritten', 'verge-media-library' ) . '</strong>'
+            /* translators: %s: the emphasised phrase "will be overwritten" */
+            __( 'ALL Media Library Settings on the Network %s with the settings of the main website.', 'verge-media-library' ),
+            '<strong style="text-transform:uppercase">' . esc_html__( 'will be overwritten', 'verge-media-library' ) . '</strong>'
         ),
         'applying_media_taxonomies_settings_text' => sprintf(
-            'ALL Media Taxonomies Settings on the Network %s with the settings of the main website. If your websites have individual taxonomies registered, they will be overwritten with the taxonomies from the main website.',
-            '<strong style="text-transform:uppercase">' . __( 'will be overwritten', 'verge-media-library' ) . '</strong>'
+            /* translators: %s: the emphasised phrase "will be overwritten" */
+            __( 'ALL Media Taxonomies Settings on the Network %s with the settings of the main website. If your websites have individual taxonomies registered, they will be overwritten with the taxonomies from the main website.', 'verge-media-library' ),
+            '<strong style="text-transform:uppercase">' . esc_html__( 'will be overwritten', 'verge-media-library' ) . '</strong>'
         ),
         'applying_mime_types_settings_text' => sprintf(
-            'ALL MIME Types Settings on the Network %s with the settings of the main website.',
-            '<strong style="text-transform:uppercase">' . __( 'will be overwritten', 'verge-media-library' ) . '</strong>'
+            /* translators: %s: the emphasised phrase "will be overwritten" */
+            __( 'ALL MIME Types Settings on the Network %s with the settings of the main website.', 'verge-media-library' ),
+            '<strong style="text-transform:uppercase">' . esc_html__( 'will be overwritten', 'verge-media-library' ) . '</strong>'
         ),
         'applying_settings_yes' => __( 'Apply', 'verge-media-library' ),
         'in_progress_apply_setings_text' => __( 'Applying Settings...', 'verge-media-library' )
@@ -718,7 +755,7 @@ function vergeml_options_page_scripts() {
 function vergeml_print_settings() {
 
     if ( ! current_user_can( 'manage_options' ) )
-        wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
 
 
     if ( is_multisite() ) {
@@ -726,7 +763,7 @@ function vergeml_print_settings() {
         $vergeml_network_options = get_site_option( 'vergeml_network_options', array() );
 
         if ( ! current_user_can( 'manage_network_options' ) && ! (bool) $vergeml_network_options['utilities'] )
-            wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
     } ?>
 
 
@@ -908,7 +945,7 @@ function vergeml_print_settings() {
 function vergeml_print_network_settings() {
 
     if ( ! current_user_can( 'manage_network_options' ) )
-        wp_die( __('You do not have sufficient permissions to access this page.', 'verge-media-library') );
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
 
 
     settings_errors();
@@ -969,7 +1006,7 @@ function vergeml_print_network_settings() {
 
                                     </table>
 
-                                    <?php submit_button( __( 'Save Changes' ), 'primary', 'eml-submit-network-settings', true ); ?>
+                                    <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'eml-submit-network-settings', true ); ?>
 
                                 </form>
 
@@ -1001,8 +1038,9 @@ function vergeml_print_network_settings() {
                                                     <legend class="screen-reader-text"><span><?php esc_html_e('Media Library Settings','verge-media-library'); ?></span></legend>
                                                     <a class="add-new-h2 vergeml-apply-settings-to-network" data-settings="media-library" href="javascript:;"><?php esc_html_e( 'Apply to ALL Network websites', 'verge-media-library' ); ?></a>
                                                     <p class="description"><?php printf(
-                                                        'Main website %s settings will be applied to all websites on the Network.',
-                                                        '<a href="' . admin_url('options-general.php?page=media-library') . '" target="_blank">' . __( 'Media Library', 'verge-media-library' ) . '</a>'
+                                                        /* translators: %s: link to the Media Library settings page */
+                                                        esc_html__( 'Main website %s settings will be applied to all websites on the Network.', 'verge-media-library' ),
+                                                        '<a href="' . esc_url( admin_url( 'options-general.php?page=media-library' ) ) . '" target="_blank">' . esc_html__( 'Media Library', 'verge-media-library' ) . '</a>'
                                                     ); ?></p>
                                                 </fieldset>
                                             </td>
@@ -1015,8 +1053,9 @@ function vergeml_print_network_settings() {
                                                     <legend class="screen-reader-text"><span><?php esc_html_e('Media Taxonomies Settings','verge-media-library'); ?></span></legend>
                                                     <a class="add-new-h2 vergeml-apply-settings-to-network" data-settings="media-taxonomies" href="javascript:;"><?php esc_html_e( 'Apply to ALL Network websites', 'verge-media-library' ); ?></a>
                                                     <p class="description"><?php printf(
-                                                        'Main website %s settings will be applied to all websites on the Network.',
-                                                        '<a href="' . admin_url('options-general.php?page=media-taxonomies') . '" target="_blank">' . __( 'Media Taxonomies', 'verge-media-library' ) . '</a>'
+                                                        /* translators: %s: link to the Media Taxonomies settings page */
+                                                        esc_html__( 'Main website %s settings will be applied to all websites on the Network.', 'verge-media-library' ),
+                                                        '<a href="' . esc_url( admin_url( 'options-general.php?page=media-taxonomies' ) ) . '" target="_blank">' . esc_html__( 'Media Taxonomies', 'verge-media-library' ) . '</a>'
                                                     ); ?></p>
                                                 </fieldset>
                                             </td>
@@ -1029,8 +1068,9 @@ function vergeml_print_network_settings() {
                                                     <legend class="screen-reader-text"><span><?php esc_html_e('MIME Types Settings','verge-media-library'); ?></span></legend>
                                                     <a class="add-new-h2 vergeml-apply-settings-to-network" data-settings="mime-types" href="javascript:;"><?php esc_html_e( 'Apply to ALL Network websites', 'verge-media-library' ); ?></a>
                                                     <p class="description"><?php printf(
-                                                        'Main website %s settings will be applied to all websites on the Network.',
-                                                        '<a href="' . admin_url('options-general.php?page=mime-types') . '" target="_blank">' . __( 'MIME Types', 'verge-media-library' ) . '</a>'
+                                                        /* translators: %s: link to the MIME Types settings page */
+                                                        esc_html__( 'Main website %s settings will be applied to all websites on the Network.', 'verge-media-library' ),
+                                                        '<a href="' . esc_url( admin_url( 'options-general.php?page=mime-types' ) ) . '" target="_blank">' . esc_html__( 'MIME Types', 'verge-media-library' ) . '</a>'
                                                     ); ?></p>
                                                 </fieldset>
                                             </td>
@@ -1258,7 +1298,7 @@ function vergeml_settings_export() {
 
     nocache_headers();
     header( 'Content-Type: application/json; charset=utf-8' );
-    header( 'Content-Disposition: attachment; filename=eml-settings-' . date('m-d-Y_hia') . '.json' );
+    header( 'Content-Disposition: attachment; filename=vergeml-settings-' . gmdate( 'm-d-Y_hia' ) . '.json' );
     header( "Expires: 0" );
 
     echo json_encode( $settings );
@@ -1550,17 +1590,30 @@ function vergeml_user_meta_cleanup() {
     $table     = _get_meta_table( 'user' );
 
 
-    $query     = $wpdb->prepare( "SELECT $id_column FROM $table WHERE meta_key LIKE %s", $meta_key . '%' );
-    $meta_ids  = $wpdb->get_col( $query );
+    /*
+     *  $table and $id_column are internal constants from _get_meta_table(), not
+     *  user input, so they are interpolated. Every value is placeheld. There is
+     *  no cache to prime or invalidate here: this runs once, from the settings
+     *  cleanup action, over rows this plugin owns.
+     */
+
+    $meta_ids = $wpdb->get_col(
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- identifiers are internal, value is placeheld below.
+        $wpdb->prepare( "SELECT $id_column FROM $table WHERE meta_key LIKE %s", $wpdb->esc_like( $meta_key ) . '%' )
+    ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- one-off cleanup of this plugin's own user meta.
 
 
     if ( ! count( $meta_ids ) ) {
         return;
     }
 
-    $query = "DELETE FROM $table WHERE $id_column IN( " . implode( ',', $meta_ids ) . ' )';
+    $meta_ids     = array_map( 'absint', $meta_ids );
+    $placeholders = implode( ',', array_fill( 0, count( $meta_ids ), '%d' ) );
 
-    $wpdb->query( $query );
+    $wpdb->query(
+        // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- identifiers are internal, ids are placeheld.
+        $wpdb->prepare( "DELETE FROM $table WHERE $id_column IN ( $placeholders )", $meta_ids )
+    ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- one-off cleanup of this plugin's own user meta.
 }
 
 
@@ -1686,12 +1739,12 @@ function vergeml_print_media_library_options() {
         $vergeml_network_options = get_site_option( 'vergeml_network_options', array() );
 
         if ( ! current_user_can( 'manage_network_options' ) && ! (bool) $vergeml_network_options['media_settings'] )
-            wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
     }
 
 
     $vergeml_lib_options = get_option( 'vergeml_lib_options' );
-    $title = __('Media Settings'); ?>
+    $title = __( 'Media Settings', 'verge-media-library' ); ?>
 
 
     <div id="vergeml-media-library-options-wrap" class="wrap eml-options">
@@ -1778,7 +1831,7 @@ function vergeml_print_media_library_options() {
 
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-filters' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-filters' ) ); ?>
 
                             </div>
 
@@ -1816,7 +1869,7 @@ function vergeml_print_media_library_options() {
 
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-scrolling' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-scrolling' ) ); ?>
 
                             </div>
 
@@ -1905,7 +1958,7 @@ function vergeml_print_media_library_options() {
 
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-search' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-search' ) ); ?>
 
                             </div>
 
@@ -1958,7 +2011,7 @@ function vergeml_print_media_library_options() {
                                     </tr>
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-order' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-order' ) ); ?>
 
                             </div>
 
@@ -2016,7 +2069,7 @@ function vergeml_print_media_library_options() {
 
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-grid-mode' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-grid-mode' ) ); ?>
 
                             </div>
 
@@ -2060,7 +2113,7 @@ function vergeml_print_media_library_options() {
                                     </tr>
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-media-shortcode' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-lib-settings-media-shortcode' ) ); ?>
 
                             </div>
 
@@ -2099,12 +2152,12 @@ function vergeml_print_taxonomies_options() {
         $vergeml_network_options = get_site_option( 'vergeml_network_options', array() );
 
         if ( ! current_user_can( 'manage_network_options' ) && ! (bool) $vergeml_network_options['media_settings'] )
-            wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
     }
 
 
     $vergeml_taxonomies = get_option( 'vergeml_taxonomies', array() );
-    $title = __('Media Settings'); ?>
+    $title = __( 'Media Settings', 'verge-media-library' ); ?>
 
 
     <div id="vergeml-global-options-wrap" class="wrap eml-options">
@@ -2263,7 +2316,7 @@ function vergeml_print_taxonomies_options() {
                                     <div class="vergeml-button-container-right"><a class="add-new-h2 vergeml-button-create-taxonomy" href="javascript:;">+ <?php esc_html_e( 'Add New Taxonomy', 'verge-media-library' ); ?></a></div>
                                 <?php endif; ?>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings-media' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings-media' ) ); ?>
                             </div>
 
                         </div>
@@ -2354,7 +2407,7 @@ function vergeml_print_taxonomies_options() {
                                     }
                                 }
 
-                                submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings-non-media' ) ); ?>
+                                submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings-non-media' ) ); ?>
 
                             </div>
 
@@ -2392,7 +2445,7 @@ function vergeml_print_taxonomies_options() {
 
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings' ) ); ?>
 
                             </div>
 
@@ -2424,7 +2477,7 @@ function vergeml_print_taxonomies_options() {
                                     </tr>
                                 </table>
 
-                                <?php submit_button( __( 'Save Changes' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings-bulk-edit' ) ); ?>
+                                <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'submit', true, array( 'id' => 'eml-submit-tax-settings-bulk-edit' ) ); ?>
 
                             </div>
 
@@ -2456,20 +2509,20 @@ function vergeml_print_taxonomies_options() {
 function vergeml_print_mimetypes_options() {
 
     if ( ! current_user_can('manage_options' ) )
-        wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
 
     if ( is_multisite() ) {
 
         $vergeml_network_options = get_site_option( 'vergeml_network_options', array() );
 
         if ( ! current_user_can( 'manage_network_options' ) && ! (bool) $vergeml_network_options['media_settings'] )
-            wp_die( __('You do not have sufficient permissions to access this page.','verge-media-library') );
+            wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
     }
 
 
     $vergeml_mimes = get_option('vergeml_mimes');
 
-    $title = __('Media Settings'); ?>
+    $title = __( 'Media Settings', 'verge-media-library' ); ?>
 
     <div id="vergeml-global-options-wrap" class="wrap eml-options">
 
@@ -2603,7 +2656,7 @@ function vergeml_print_mimetypes_options() {
 function vergeml_print_mimetypes_buttons() { ?>
 
     <p class="submit">
-        <?php submit_button( __( 'Save Changes' ), 'primary', 'eml-save-mime-types-settings', false, array( 'id' => 'eml-submit-settings-save-mime-types' ) ); ?>
+        <?php submit_button( __( 'Save Changes', 'verge-media-library' ), 'primary', 'eml-save-mime-types-settings', false, array( 'id' => 'eml-submit-settings-save-mime-types' ) ); ?>
 
         <input type="button" name="eml-restore-mime-types-settings" id="eml-restore-mime-types-settings" class="button" value="<?php esc_html_e('Restore WordPress Default MIME Types','verge-media-library'); ?>">
     </p>

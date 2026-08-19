@@ -4,7 +4,7 @@ Tags: media library, media folders, media tags, media categories, mime types
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.9.7
+Stable tag: 2.9.8
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -200,6 +200,27 @@ On the [issue tracker](https://github.com/vergelabsnathan/verge-media-library/is
 
 
 ## Changelog ##
+
+### 2.9.8 ###
+*Security, privacy and review readiness*
+
+= Security =
+* Request data across the media filters, the list table filters, the network settings form and the drag-and-drop reorder is now unslashed and sanitised on the way in.
+* The settings import no longer passes the uploaded file through as-is; each field is rebuilt and sanitised before anything touches it.
+* The list view was handing the entire raw query string to JavaScript. It is sanitised now.
+* Saving an attachment's fields verifies its nonce before reading what was submitted, rather than after.
+
+= Removed =
+* Three settings blocks that were permanently greyed out and labelled "/ Premium Feature" — Search, Bulk Edit, and auto-assign with Synchronize Now. None of them did anything: their options were stored but never read, because the behaviour lived in a paid add-on that is not part of this plugin. The Search box stays, and now simply works: search on enter, minimum letters and auto search were never paid features to begin with.
+* Links that sent you to the original author's documentation and support desk, and a note promising a fix in "the upcoming major update v3.0", which was their roadmap.
+
+= Fixed =
+* Reordering media now clears the affected items from the object cache, so the old order is not served back afterwards.
+* Media filters in the modal no longer shrink to a few characters wide when several are enabled.
+
+= Under the hood =
+* Every output is escaped and every translated string carries this plugin's text domain. Some labels that previously borrowed WordPress's own translations will read in English until translated.
+* WordPress's automated Plugin Check reports zero errors and zero warnings.
 
 ### 2.9.7 ###
 *Feature restored, and the media view code made maintainable*

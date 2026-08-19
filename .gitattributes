@@ -5,3 +5,4 @@
 /.release-assets  export-ignore
 /playground       export-ignore
 /docs             export-ignore
+/assets           export-ignore

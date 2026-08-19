@@ -149,45 +149,53 @@ Please notice that you use Enhanced Media Library with other plugins that add me
 
 ## Installation ##
 
-1. Upload plugin folder to '/wp-content/plugins/' directory
+1. Install the zip through **Plugins > Add New > Upload Plugin**, or upload the plugin folder to `/wp-content/plugins/`.
 
-2. Activate the plugin through `Plugins` menu in WordPress admin
+2. Activate the plugin through the **Plugins** menu in WordPress.
 
-3. Adjust plugin's settings on `Settings > Media`
+3. Adjust the settings under **Settings > Media**.
 
-4. Enjoy Enhanced Media Library!
+If you are moving over from Enhanced Media Library, deactivate it before activating this one.
 
 
 
 ## Frequently Asked Questions ##
 
-> [FAQs](https://www.wpuxsolutions.com/documents/enhanced-media-library/faqs-2/) | [Documentation](https://www.wpuxsolutions.com/documents/enhanced-media-library/)
+= Will my Enhanced Media Library settings carry over? =
+
+Yes. Activating this plugin copies your taxonomies, MIME types, and library and filter settings across. The originals are left where they are, so nothing is lost if you decide to switch back.
+
+= Can I run this alongside Enhanced Media Library? =
+
+It will not break your site if you do: every function, class, option, script handle and AJAX action carries its own prefix. But both plugins register taxonomies against your media library, so you would see each of them twice. Deactivate Enhanced Media Library first.
+
+= How different is this from the original? =
+
+Not very. It is Enhanced Media Library 2.9.4 with the WordPress 7 toolbar layout repaired, the PHP 8 warnings cleared, a missing capability check added to the multisite settings handler, and the Bulk select button restored. Roughly 97% of the code is unchanged.
+
+= Does it send anything to an external service? =
+
+No. The original polled its author's server twice a day for admin notices and printed whatever came back into your dashboard. That has been removed. This plugin makes no outbound requests of any kind.
+
+= Where do I report a problem? =
+
+On the [issue tracker](https://github.com/vergelabsnathan/verge-media-library/issues).
 
 
 
 ## Screenshots ##
 
-1. Plugin Settings: WordPress General Media Settings
+1. The media library grid, with filters for type, date, author and any taxonomy you have assigned, plus Reset All Filters and Bulk select.
 
-2. Plugin Settings: Media Items Order & Enhanced Media Shortcodes
+2. List view, with your media taxonomies as sortable columns and filters above the table.
 
-3. Plugin Settings: Media Taxonomies & Filters
+3. Media Library settings: ordering, filters, search fields, grid captions and infinite scrolling.
 
-4. Plugin Settings: MIME Types settings
+4. Media Taxonomies settings: assign existing taxonomies to media or create your own.
 
-5. Plugin Settings: Export, Import, Restore, Cleanup
+5. MIME Types settings: add, remove, rename and allow or disallow file types.
 
-6. Media Taxonomies are just usual WordPress taxonomies
-
-7. Media categories and tags in Nav Menu
-
-8. Media Library Grid Mode
-
-9. Media Library List Mode
-
-10. Editing individual image / media items
-
-11. Filter-based image gallery
+6. The media modal inside the editor, with the same filters available when you insert an image.
 
 
 

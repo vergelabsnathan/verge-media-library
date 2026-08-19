@@ -248,7 +248,9 @@ function vergeml_submenu_order() {
 
     $media_key = 0;
     $media_items = array();
-    $page = isset( $_GET['page'] ) && in_array( $_GET['page'], array('media','media-library','media-taxonomies','mime-types') ) ? $_GET['page'] : '';
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- reading which settings tab to mark active, no state is changed.
+    $requested_page = isset( $_GET['page'] ) ? sanitize_key( wp_unslash( $_GET['page'] ) ) : '';
+    $page = in_array( $requested_page, array( 'media', 'media-library', 'media-taxonomies', 'mime-types' ), true ) ? $requested_page : '';
     $settings_menu = array_values( $submenu['options-general.php'] );
 
     foreach( $settings_menu as $key => $item ) {
@@ -294,11 +296,21 @@ function vergeml_load_media_options_page() {
 
     $hook_suffix = $pagenow = 'options-media.php';
 
+    /*
+     *  These are WordPress's own admin page lifecycle hooks, not ours. This
+     *  screen replaces options-media.php, so it has to fire them or every other
+     *  plugin that enqueues assets or prints markup for that screen is silently
+     *  skipped. Prefixing them would not namespace anything, it would stop them
+     *  reaching the callbacks they exist for.
+     */
+
+    // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hooks, deliberately fired.
     do_action( "load-{$hook_suffix}" );
     do_action( 'admin_enqueue_scripts', $hook_suffix );
     do_action( "admin_print_styles-{$hook_suffix}" );
     do_action( "admin_print_scripts-{$hook_suffix}" );
     do_action( "admin_head-{$hook_suffix}" );
+    // phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
     add_filter( 'admin_body_class', 'vergeml_admin_body_class_for_media_options_page' );
     add_filter( 'admin_title', 'vergeml_admin_title_for_media_options_page', 10, 2 );
@@ -355,6 +367,7 @@ function vergeml_media_options_page() {
 
     $hook_suffix = 'options-media.php';
 
+    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.DynamicHooknameFound -- fires core's own options-media.php screen hook.
     do_action( $hook_suffix );
 }
 
@@ -1247,7 +1260,9 @@ function vergeml_update_network_settings() {
         return;
 
 
-    $vergeml_network_options = isset( $_POST['vergeml_network_options'] ) ? $_POST['vergeml_network_options'] : array();
+    $vergeml_network_options = isset( $_POST['vergeml_network_options'] )
+        ? map_deep( wp_unslash( (array) $_POST['vergeml_network_options'] ), 'sanitize_text_field' )
+        : array();
 
     $vergeml_network_options = vergeml_tax_options_validate( $vergeml_network_options );
 
@@ -1337,7 +1352,19 @@ function vergeml_settings_import() {
     }
 
 
-    $import_file = $_FILES['import_file'];
+    /*
+     *  Only tmp_name is read, and only to hand to wp_handle_upload below, which
+     *  does its own MIME and error checking. The name is sanitised so nothing
+     *  from the upload reaches the filesystem or a message unchecked.
+     */
+
+    $import_file = array(
+        'name'     => isset( $_FILES['import_file']['name'] ) ? sanitize_file_name( wp_unslash( $_FILES['import_file']['name'] ) ) : '',
+        'type'     => isset( $_FILES['import_file']['type'] ) ? sanitize_mime_type( wp_unslash( $_FILES['import_file']['type'] ) ) : '',
+        'tmp_name' => isset( $_FILES['import_file']['tmp_name'] ) ? sanitize_text_field( wp_unslash( $_FILES['import_file']['tmp_name'] ) ) : '',
+        'error'    => isset( $_FILES['import_file']['error'] ) ? (int) $_FILES['import_file']['error'] : UPLOAD_ERR_NO_FILE,
+        'size'     => isset( $_FILES['import_file']['size'] ) ? (int) $_FILES['import_file']['size'] : 0,
+    );
 
     if ( empty( $import_file['tmp_name'] ) ) {
 
@@ -1507,6 +1534,17 @@ function vergeml_settings_cleanup() {
  *  @created  28/04/18
  */
 
+/*
+ *  Deletes this plugin's taxonomies and their attachment relationships in bulk.
+ *  There is no core call that removes term relationships for one post type
+ *  only, and doing it through wp_remove_object_terms() would be one query per
+ *  attachment per term, which on a large library is tens of thousands of
+ *  queries. Table names are $wpdb's, every value is placeheld, and the caches
+ *  that matter are cleaned by the core hooks fired around the delete.
+ */
+
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, PluginCheck.Security.DirectDB.UnescapedDBParameter
+
 function vergeml_term_relationship_cleanup() {
 
     global $wpdb;
@@ -1548,6 +1586,7 @@ function vergeml_term_relationship_cleanup() {
             }
 
             foreach( $deleted_tt_ids as $attachment_id => $tt_ids ) {
+                // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook; other plugins and core caches rely on it firing.
                 do_action( 'delete_term_relationships', $attachment_id, $tt_ids );
             }
 
@@ -1565,6 +1604,7 @@ function vergeml_term_relationship_cleanup() {
             if ( false !== $removed ) {
 
                 foreach( $deleted_tt_ids as $attachment_id => $tt_ids ) {
+                    // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core hook; other plugins and core caches rely on it firing.
                     do_action( 'deleted_term_relationships', $attachment_id, $tt_ids );
                 }
             }
@@ -1624,6 +1664,8 @@ function vergeml_user_meta_cleanup() {
  *  @since    2.6
  *  @created  28/04/18
  */
+
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare, PluginCheck.Security.DirectDB.UnescapedDBParameter
 
 function vergeml_options_cleanup() {
 

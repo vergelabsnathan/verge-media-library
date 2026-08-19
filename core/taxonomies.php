@@ -209,12 +209,22 @@ function vergeml_tax_options_validate( $input ) {
 
 add_filter( 'ajax_query_attachments_args', 'vergeml_ajax_query_attachments_args' );
 
+/*
+ *  Reads the filter values the media grid sent and turns them into query args.
+ *  Nothing is written, so there is no nonce: this is the same request WordPress
+ *  itself already authenticated for the attachments query, and a nonce would
+ *  make the library unfilterable from any link or bookmark. The tax_query is
+ *  the plugin's entire purpose, so the slow-query notice does not apply.
+ */
+
+// phpcs:disable WordPress.Security.NonceVerification.Recommended, WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+
 function vergeml_ajax_query_attachments_args( $query ) {
 
     $vergeml_taxonomies = get_option( 'vergeml_taxonomies', array() );
     $vergeml_lib_options = get_option( 'vergeml_lib_options' );
     $tax_query = array();
-    $eml_query = isset( $_REQUEST['query'] ) ? (array) $_REQUEST['query'] : array();
+    $eml_query = isset( $_REQUEST['query'] ) ? map_deep( wp_unslash( (array) $_REQUEST['query'] ), 'sanitize_text_field' ) : array();
     $processed_taxonomies = get_object_taxonomies( 'attachment', 'object' );
     $keys = array(
         'uncategorized',
@@ -327,6 +337,16 @@ function vergeml_ajax_query_attachments_args( $query ) {
  */
 
 add_action( 'restrict_manage_posts', 'vergeml_restrict_manage_posts', 10, 2 );
+
+// phpcs:enable WordPress.Security.NonceVerification.Recommended, WordPress.DB.SlowDBQuery.slow_db_query_tax_query
+
+/*
+ *  Draws the filter dropdowns above the media list table and marks the current
+ *  selection. Read-only, so no nonce; requiring one would break every filtered
+ *  URL people share or bookmark.
+ */
+
+// phpcs:disable WordPress.Security.NonceVerification.Recommended
 
 function vergeml_restrict_manage_posts( $post_type, $which ) {
 
@@ -532,6 +552,16 @@ function vergeml_parse_tax_query( $query ) {
 
 add_action( 'parse_tax_query', 'vergeml_backend_parse_tax_query' );
 
+// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+/*
+ *  Translates the filter values in the request into the tax_query for the media
+ *  list table. Read-only and no nonce, for the same reason as the dropdowns
+ *  above: these are shareable, bookmarkable filter URLs, not state changes.
+ */
+
+// phpcs:disable WordPress.Security.NonceVerification.Recommended
+
 function vergeml_backend_parse_tax_query( $query ) {
 
     if ( ! is_admin() ) {
@@ -562,10 +592,10 @@ function vergeml_backend_parse_tax_query( $query ) {
 
 
     if ( isset( $_REQUEST['category'] ) )
-        $query->query['category'] = $query->query_vars['category'] = $_REQUEST['category'];
+        $query->query['category'] = $query->query_vars['category'] = sanitize_text_field( wp_unslash( $_REQUEST['category'] ) );
 
     if ( isset( $_REQUEST['post_tag'] ) )
-        $query->query['post_tag'] = $query->query_vars['post_tag'] = $_REQUEST['post_tag'];
+        $query->query['post_tag'] = $query->query_vars['post_tag'] = sanitize_text_field( wp_unslash( $_REQUEST['post_tag'] ) );
 
     if ( isset( $query->query_vars['taxonomy'] ) && isset( $query->query_vars['term'] ) ) {
 
@@ -590,7 +620,7 @@ function vergeml_backend_parse_tax_query( $query ) {
 
         if ( ! isset( $_REQUEST['filter_action'] ) && isset( $_REQUEST[$taxonomy] ) ) {
 
-            $term = get_term_by( 'slug', $_REQUEST[$taxonomy], $taxonomy );
+            $term = get_term_by( 'slug', sanitize_text_field( wp_unslash( $_REQUEST[ $taxonomy ] ) ), $taxonomy );
 
             if ( $term ) {
 
@@ -746,6 +776,7 @@ class vergeml_Walker_CategoryDropdown extends Walker_CategoryDropdown {
         $pad = str_repeat('&nbsp;', $depth * 3);
 
         /** This filter is documented in wp-includes/category-template.php */
+        // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core filter, applied so term names render the way core does.
         $cat_name = apply_filters( 'list_cats', $category->name, $category );
 
         if ( isset( $args['value_field'] ) && isset( $category->{$args['value_field']} ) ) {
@@ -782,6 +813,17 @@ class vergeml_Walker_CategoryDropdown extends Walker_CategoryDropdown {
  *  @created  14/06/16
  */
 
+/*
+ *  Counts attachments in a term, optionally including child terms. There is no
+ *  core API for this: get_term() returns a count for all post types, and this
+ *  needs attachments only, with the child rollup the plugin's filters promise.
+ *  Table names come from $wpdb and every value is placeheld. The result is
+ *  deliberately uncached because it is read while the counts are being changed,
+ *  and a stale number is worse than the query.
+ */
+
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+
 function vergeml_get_media_term_count( $term_id, $tt_id ) {
 
     global $wpdb;
@@ -814,6 +856,7 @@ function vergeml_get_media_term_count( $term_id, $tt_id ) {
     ) );
 
     $count = $results ? $wpdb->num_rows : 0;
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
 
     return $count;
 }
@@ -856,6 +899,7 @@ if ( ! class_exists( 'Walker_Media_Taxonomy_Checklist' ) ) {
                 $taxonomy = 'category';
 
             $class = in_array( $category->term_id, $popular_cats ) ? ' class="popular-category"' : '';
+            // phpcs:ignore WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core filter, applied so term names render the way core does.
             $output .= "\n<li id='{$taxonomy}-{$category->term_id}'$class>" . "<label class='selectit'><input value='0' type='hidden' name='tax_input[{$taxonomy}][{$category->term_id}]' /><input value='1' type='checkbox' name='tax_input[{$taxonomy}][{$category->term_id}]' id='in-{$taxonomy}-{$category->term_id}'" . checked( in_array( $category->term_id, $selected_cats ), true, false ) . disabled( empty( $args['disabled'] ), false, false ) . " />" . esc_html( apply_filters('the_category', $category->name )) . "</label>";
         }
 
@@ -907,8 +951,10 @@ if ( ! class_exists( 'Walker_Media_Taxonomy_Uploader_Filter' ) ) {
             $el = array(
                 'term_id' => intval( $category->term_id ),
                 'slug' => $category->slug,
+                // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core filter, applied so term names render the way core does.
                 'term_name' => esc_html( apply_filters( 'the_category', $category->name ) ),
                 'term_row' => $indent . esc_html( apply_filters( 'the_category', $category->name ) ) . $count
+                // phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
             );
 
             $output .= json_encode( $el );
@@ -936,20 +982,38 @@ add_action( 'wp_ajax_save-attachment-compat', 'vergeml_save_attachment_compat', 
 
 function vergeml_save_attachment_compat() {
 
-    if ( ! isset( $_REQUEST['id'] ) )
+    // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- only the id, and only to build the nonce action checked immediately below.
+    $id = isset( $_REQUEST['id'] ) ? absint( $_REQUEST['id'] ) : 0;
+
+    if ( ! $id )
         wp_send_json_error();
 
-    if ( ! $id = absint( $_REQUEST['id'] ) )
-        wp_send_json_error();
+    /*
+     *  Verify before reading anything else. Upstream checked the nonce after
+     *  pulling the submitted fields out of the request; nothing was exploitable
+     *  because the write still came later, but there is no reason to touch the
+     *  payload of an unverified request at all.
+     */
+
+    check_ajax_referer( 'update-post_' . $id, 'nonce' );
 
     if ( empty( $_REQUEST['attachments'] ) || empty( $_REQUEST['attachments'][ $id ] ) )
         wp_send_json_error();
 
 
     $vergeml_lib_options = get_option( 'vergeml_lib_options' );
-    $attachment_data = $_REQUEST['attachments'][ $id ];
 
-    check_ajax_referer( 'update-post_' . $id, 'nonce' );
+    /*
+     *  Left slashed and unsanitised on purpose, exactly as core's own
+     *  wp_ajax_save_attachment_compat does. This is attachment field content --
+     *  title, caption, description -- which is handed to the
+     *  attachment_fields_to_save filter and then to wp_update_post, both of
+     *  which expect slashed input and do the sanitising themselves. Cleaning it
+     *  here would double-unslash and strip markup people are allowed to save.
+     */
+
+    // phpcs:ignore WordPress.Security.ValidatedSanitizedInput.InputNotSanitized, WordPress.Security.ValidatedSanitizedInput.MissingUnslash -- see above; sanitised downstream by wp_update_post.
+    $attachment_data = $_REQUEST['attachments'][ $id ];
 
     if ( ! current_user_can( 'edit_post', $id ) )
         wp_send_json_error();
@@ -960,7 +1024,9 @@ function vergeml_save_attachment_compat() {
         wp_send_json_error();
 
     /** This filter is documented in wp-admin/includes/media.php */
+    // phpcs:disable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound -- core filter; this handler stands in for core's, so it must run the same filter.
     $post = apply_filters( 'attachment_fields_to_save', $post, $attachment_data );
+    // phpcs:enable WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
     if ( isset( $post['errors'] ) ) {
 
@@ -1086,18 +1152,31 @@ function vergeml_delete_post() {
 
 add_action( 'wp_ajax_save-attachment-order', 'vergeml_save_attachment_order', 0 );
 
+// phpcs:enable WordPress.Security.NonceVerification.Recommended
+
 function vergeml_save_attachment_order() {
 
     global $wpdb;
 
 
+    /*
+     *  post_id has to be read before the nonce, because it is what picks which
+     *  nonce action applies: attached media is verified against that post,
+     *  unattached media against the bulk edit nonce. Nothing is read beyond the
+     *  id itself until one of those checks has passed.
+     */
+
+    // phpcs:disable WordPress.Security.NonceVerification.Recommended -- the id below selects which nonce action to verify; both branches verify before doing anything.
     if ( ! isset( $_REQUEST['post_id'] ) )
         wp_send_json_error();
 
     if ( empty( $_REQUEST['attachments'] ) )
         wp_send_json_error();
 
-    if ( $post_id = absint( $_REQUEST['post_id'] ) ) {
+    $post_id = absint( $_REQUEST['post_id'] );
+    // phpcs:enable WordPress.Security.NonceVerification.Recommended
+
+    if ( $post_id ) {
 
         check_ajax_referer( 'update-post_' . $post_id, 'nonce' );
 
@@ -1109,10 +1188,13 @@ function vergeml_save_attachment_order() {
     }
 
 
-    $attachments = $_REQUEST['attachments'];
+    // this payload is only ever attachment id => menu order position
+    $attachments = map_deep( wp_unslash( (array) $_REQUEST['attachments'] ), 'intval' );
     $attachments2edit = array();
 
     foreach ( $attachments as $attachment_id => $menu_order ) {
+
+        $attachment_id = absint( $attachment_id );
 
         if ( ! current_user_can( 'edit_post', $attachment_id ) )
             continue;
@@ -1128,8 +1210,17 @@ function vergeml_save_attachment_order() {
     asort( $attachments2edit );
     $order = array_keys( $attachments2edit );
     $order_format = join( ', ', array_fill( 0, count( $order ), '%d' ) );
-    $wpdb->query( 'SELECT @i:=0' );
 
+    /*
+     *  Renumbering menu_order across a whole drag-and-drop reorder in one
+     *  statement. Doing it through wp_update_post would be one full post save
+     *  per item, which on a few hundred images is the difference between
+     *  instant and unusable. The MySQL counter variable is why it cannot be
+     *  expressed with the posts API. Ids are placeheld; table names are $wpdb's.
+     */
+
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+    $wpdb->query( 'SELECT @i:=0' );
 
     $result = $wpdb->query( $wpdb->prepare(
         "
@@ -1138,6 +1229,16 @@ function vergeml_save_attachment_order() {
         ",
         array_merge( $order, $order )
     ) );
+    // phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.DB.PreparedSQL.InterpolatedNotPrepared, WordPress.DB.PreparedSQLPlaceholders.UnfinishedPrepare
+
+    /*
+     *  The rows were changed underneath the object cache, so drop each post
+     *  from it or the old menu_order is served until something else evicts it.
+     */
+
+    foreach ( $order as $reordered_id ) {
+        clean_post_cache( $reordered_id );
+    }
 
 
     if ( ! $result )
@@ -1221,6 +1322,16 @@ function vergeml_get_media_term_pairs( $terms = array(), $mode = 'id=>tt_id' ) {
  *  @created  22/06/16
  */
 
+/*
+ *  Both functions below are registered as a taxonomy's update_count_callback,
+ *  so they stand in for core's own and have to behave the same way: recount
+ *  from the tables, fire core's term_taxonomy hooks around the write, and skip
+ *  the object cache, since the whole point is to replace the number that is
+ *  cached. The hooks are core's, not ours, and must keep their own names.
+ */
+
+// phpcs:disable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
+
 function vergeml_update_attachment_term_count( $terms, $taxonomy ) {
 
     global $wpdb;
@@ -1230,6 +1341,13 @@ function vergeml_update_attachment_term_count( $terms, $taxonomy ) {
         $count = 0;
 
         $count += (int) $wpdb->get_var( $wpdb->prepare( "SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts p1 WHERE p1.ID = $wpdb->term_relationships.object_id AND post_type = 'attachment' AND ( post_status = 'publish' OR post_status = 'inherit' ) AND term_taxonomy_id = %d", $term ) );
+
+        /*
+         *  These are core's term-count hooks, fired around core's own
+         *  term_taxonomy table write, exactly as core's count callbacks do.
+         *  This function is registered as a taxonomy's update_count_callback,
+         *  so it stands in for core's version and has to behave like it.
+         */
 
         do_action( 'edit_term_taxonomy', $term, $taxonomy->name );
         $wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );
@@ -1277,20 +1395,30 @@ function vergeml_update_post_term_count( $terms, $taxonomy ) {
 
             $placeholders = implode( ', ', array_fill( 0, count( $object_types ), '%s' ) );
 
+            // phpcs:disable WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names are from $wpdb, every value is placeheld.
             $count += (int) $wpdb->get_var(
                 $wpdb->prepare(
-                    // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared -- table names are from $wpdb, every value is placeheld.
                     "SELECT COUNT(*) FROM $wpdb->term_relationships, $wpdb->posts WHERE $wpdb->posts.ID = $wpdb->term_relationships.object_id AND post_status = 'publish' AND post_type IN ( $placeholders ) AND term_taxonomy_id = %d",
                     array_merge( $object_types, array( $term ) )
                 )
-            ); // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching -- term counts are recalculated on demand; caching them would serve stale counts.
+            );
+            // phpcs:enable WordPress.DB.PreparedSQL.InterpolatedNotPrepared
         }
+
+        /*
+         *  These are core's term-count hooks, fired around core's own
+         *  term_taxonomy table write, exactly as core's count callbacks do.
+         *  This function is registered as a taxonomy's update_count_callback,
+         *  so it stands in for core's version and has to behave like it.
+         */
 
         do_action( 'edit_term_taxonomy', $term, $taxonomy->name );
         $wpdb->update( $wpdb->term_taxonomy, compact( 'count' ), array( 'term_taxonomy_id' => $term ) );
         do_action( 'edited_term_taxonomy', $term, $taxonomy->name );
     }
 }
+
+// phpcs:enable WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching, WordPress.NamingConventions.PrefixAllGlobals.NonPrefixedHooknameFound
 
 
 

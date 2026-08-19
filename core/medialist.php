@@ -142,6 +142,7 @@ function vergeml_shortcode_atts( $output, $defaults = array(), $atts = array(), 
     if ( ! empty( $tax_query ) ) {
 
         $tax_query['relation'] = 'AND';
+        // phpcs:ignore WordPress.DB.SlowDBQuery.slow_db_query_tax_query -- filtering a gallery by media taxonomy is the feature; there is no other way to express it.
         $query['tax_query'] = $tax_query;
     }
 

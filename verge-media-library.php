@@ -458,7 +458,8 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             );
 
             $media_list_l10n = array(
-                '$_GET'             => wp_json_encode($_GET),
+                // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only: the list view rebuilds its own filter links from the current query string.
+                '$_GET'             => wp_json_encode( map_deep( wp_unslash( $_GET ), 'sanitize_text_field' ) ),
                 'uncategorized'     => __( 'All Uncategorized', 'verge-media-library' ),
                 'reset_all_filters' => __( 'Reset All Filters', 'verge-media-library' ),
                 'filters_to_show'   => $vergeml_lib_options ? array_map( 'sanitize_key', $vergeml_lib_options['filters_to_show'] ) : array(

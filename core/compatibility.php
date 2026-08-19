@@ -26,7 +26,9 @@ function vergeml_elementor_scripts() {
     wp_enqueue_style( 'common' );
     wp_enqueue_style(
         'vergeml-elementor-media-style',
-        $vergeml_dir . 'css/eml-admin-media.css'
+        $vergeml_dir . 'css/eml-admin-media.css',
+        array(),
+        VERGEML_VERSION
     );
 }
 
@@ -86,17 +88,17 @@ if ( vergeml_enhance_media_shortcodes() ) {
      *  @created  9/10/20
      */
 
-    $wp_theme = wp_get_theme();
+    $vergeml_theme = wp_get_theme();
 
-    if ( ! empty( $wp_theme ) ) {
+    if ( ! empty( $vergeml_theme ) ) {
 
-        $wp_parent_theme = $wp_theme->parent();
+        $vergeml_parent_theme = $vergeml_theme->parent();
 
-        if ( ! empty( $wp_parent_theme ) ) {
-            $wp_theme = $wp_parent_theme;
+        if ( ! empty( $vergeml_parent_theme ) ) {
+            $vergeml_theme = $vergeml_parent_theme;
         }
 
-        if ( 'Enfold' === $wp_theme->get( 'Name' ) && version_compare( $wp_theme->get( 'Version' ), '4.8.4', '>=') ) {
+        if ( 'Enfold' === $vergeml_theme->get( 'Name' ) && version_compare( $vergeml_theme->get( 'Version' ), '4.8.4', '>=') ) {
 
             add_filter( 'shortcode_atts_av_masonry_gallery', 'vergeml_shortcode_atts', 10, 3 );
         }   

@@ -18,6 +18,14 @@ function vergeml_mimes_validate( $input ) {
     if ( ! $input ) $input = array();
 
 
+    /*
+     *  This is a register_setting() sanitize callback, so it only runs from
+     *  options.php, which has already checked the nonce and the capability
+     *  before calling it. Re-checking here would be checking the same nonce
+     *  twice.
+     */
+
+    // phpcs:ignore WordPress.Security.NonceVerification.Missing -- verified by options.php before this callback runs.
     if ( isset( $_POST['eml-restore-mime-types-settings'] ) ) {
 
         add_settings_error(

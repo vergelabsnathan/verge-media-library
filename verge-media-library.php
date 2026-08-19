@@ -284,7 +284,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
                         'show_ui'               => true,
                         'show_admin_column'     => (bool) $params['show_admin_column'],
                         'hierarchical'          => (bool) $params['hierarchical'],
-                        'update_count_callback' => '_eml_update_attachment_term_count',
+                        'update_count_callback' => 'vergeml_update_attachment_term_count',
                         'sort'                  => (bool) $params['sort'],
                         'show_in_rest'          => (bool) $params['show_in_rest'],
                         'query_var'             => sanitize_key( $taxonomy ),
@@ -371,7 +371,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             if ( in_array( 'post', $params->object_type ) ) {
 
                 if ( in_array( 'attachment', $params->object_type ) )
-                    $wp_taxonomies[$taxonomy]->update_count_callback = '_eml_update_post_term_count';
+                    $wp_taxonomies[$taxonomy]->update_count_callback = 'vergeml_update_post_term_count';
                 else
                     unset( $wp_taxonomies[$taxonomy]->update_count_callback );
             }

@@ -1214,13 +1214,13 @@ function vergeml_get_media_term_pairs( $terms = array(), $mode = 'id=>tt_id' ) {
 
 
 /**
- *  _eml_update_attachment_term_count
+ *  vergeml_update_attachment_term_count
  *
  *  @since    2.3
  *  @created  22/06/16
  */
 
-function _eml_update_attachment_term_count( $terms, $taxonomy ) {
+function vergeml_update_attachment_term_count( $terms, $taxonomy ) {
 
     global $wpdb;
 
@@ -1239,13 +1239,13 @@ function _eml_update_attachment_term_count( $terms, $taxonomy ) {
 
 
 /**
- *  _eml_update_post_term_count
+ *  vergeml_update_post_term_count
  *
  *  @since    2.3
  *  @created  22/06/16
  */
 
-function _eml_update_post_term_count( $terms, $taxonomy ) {
+function vergeml_update_post_term_count( $terms, $taxonomy ) {
 
     global $wpdb;
 

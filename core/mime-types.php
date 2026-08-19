@@ -31,7 +31,7 @@ function vergeml_mimes_validate( $input ) {
         add_settings_error(
             'mime-types',
             'eml_mime_types_restored',
-            __('MIME Types settings restored.', 'verge-media-library'),
+            __('MIME Types settings restored.', 'vergelabs-media-library'),
             'updated'
         );
 
@@ -59,7 +59,7 @@ function vergeml_mimes_validate( $input ) {
     add_settings_error(
         'mime-types',
         'eml_mime_types_saved',
-        __('MIME Types settings saved.', 'verge-media-library'),
+        __('MIME Types settings saved.', 'vergelabs-media-library'),
         'updated'
     );
     
@@ -136,14 +136,14 @@ function vergeml_post_mime_types( $post_mime_types ) {
                 esc_html( $type_array['plural'] ),
                 sprintf(
                     /* translators: %s: plural name of a file type, for example "Images" */
-                    esc_html__( 'Manage %s', 'verge-media-library' ),
+                    esc_html__( 'Manage %s', 'vergelabs-media-library' ),
                     esc_html( $type_array['plural'] )
                 ),
                 array(
                     'singular' => esc_html( $type_array['singular'] ) . ' <span class="count">(%s)</span>',
                     'plural'   => esc_html( $type_array['plural'] ) . ' <span class="count">(%s)</span>',
                     'context'  => null,
-                    'domain'   => 'verge-media-library',
+                    'domain'   => 'vergelabs-media-library',
                 )
             );
         }

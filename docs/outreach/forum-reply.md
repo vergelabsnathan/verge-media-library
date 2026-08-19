@@ -59,7 +59,7 @@ Add that at 900px and below as `display: block`, which is what core does at that
 
 The duplicate id needs a JS change, so CSS alone won't fully fix the author filter.
 
-I've put a patched build together with these fixes and the PHP 8 warnings cleared. It's GPLv2 like the original and credits wpUXsolutions: https://github.com/vergelabsnathan/verge-media-library/releases
+I've put a patched build together with these fixes and the PHP 8 warnings cleared. It's GPLv2 like the original and credits wpUXsolutions: https://github.com/vergelabsnathan/vergelabs-media-library/releases
 
 ---
 

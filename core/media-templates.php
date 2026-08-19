@@ -60,30 +60,30 @@ function vergeml_print_media_templates() { ?>
                 <# } #>
             </div>
             <# if ( data.buttons.close ) { #>
-                <button type="button" class="button-link attachment-close media-modal-icon"><span class="screen-reader-text"><?php esc_html_e( 'Remove', 'verge-media-library' ); ?></span></button>
+                <button type="button" class="button-link attachment-close media-modal-icon"><span class="screen-reader-text"><?php esc_html_e( 'Remove', 'vergelabs-media-library' ); ?></span></button>
             <# } #>
         </div>
         <# if ( data.buttons.check ) { #>
-            <button type="button" class="check" tabindex="-1"><span class="media-modal-icon"></span><span class="screen-reader-text"><?php esc_html_e( 'Deselect', 'verge-media-library' ); ?></span></button>
+            <button type="button" class="check" tabindex="-1"><span class="media-modal-icon"></span><span class="screen-reader-text"><?php esc_html_e( 'Deselect', 'vergelabs-media-library' ); ?></span></button>
         <# } #>
         <#
         var maybeReadOnly = data.can.save || data.allowLocalEdits ? '' : 'readonly';
         if ( data.describe ) {
             if ( 'image' === data.type ) { #>
                 <input type="text" value="{{ data.caption }}" class="describe" data-setting="caption"
-                    aria-label="<?php esc_attr_e( 'Caption', 'verge-media-library' ); ?>"
-                    placeholder="<?php esc_attr_e( 'Caption&hellip;', 'verge-media-library' ); ?>" {{ maybeReadOnly }} />
+                    aria-label="<?php esc_attr_e( 'Caption', 'vergelabs-media-library' ); ?>"
+                    placeholder="<?php esc_attr_e( 'Caption&hellip;', 'vergelabs-media-library' ); ?>" {{ maybeReadOnly }} />
             <# } else { #>
                 <input type="text" value="{{ data.title }}" class="describe" data-setting="title"
                     <# if ( 'video' === data.type ) { #>
-                        aria-label="<?php esc_attr_e( 'Video title', 'verge-media-library' ); ?>"
-                        placeholder="<?php esc_attr_e( 'Video title&hellip;', 'verge-media-library' ); ?>"
+                        aria-label="<?php esc_attr_e( 'Video title', 'vergelabs-media-library' ); ?>"
+                        placeholder="<?php esc_attr_e( 'Video title&hellip;', 'vergelabs-media-library' ); ?>"
                     <# } else if ( 'audio' === data.type ) { #>
-                        aria-label="<?php esc_attr_e( 'Audio title', 'verge-media-library' ); ?>"
-                        placeholder="<?php esc_attr_e( 'Audio title&hellip;', 'verge-media-library' ); ?>"
+                        aria-label="<?php esc_attr_e( 'Audio title', 'vergelabs-media-library' ); ?>"
+                        placeholder="<?php esc_attr_e( 'Audio title&hellip;', 'vergelabs-media-library' ); ?>"
                     <# } else { #>
-                        aria-label="<?php esc_attr_e( 'Media title', 'verge-media-library' ); ?>"
-                        placeholder="<?php esc_attr_e( 'Media title&hellip;', 'verge-media-library' ); ?>"
+                        aria-label="<?php esc_attr_e( 'Media title', 'vergelabs-media-library' ); ?>"
+                        placeholder="<?php esc_attr_e( 'Media title&hellip;', 'vergelabs-media-library' ); ?>"
                     <# } #> {{ maybeReadOnly }} />
             <# }
         } #>

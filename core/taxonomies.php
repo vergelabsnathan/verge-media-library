@@ -95,7 +95,7 @@ function vergeml_taxonomies_validate( $input ) {
     add_settings_error(
         'media-taxonomies',
         'eml_taxonomy_settings_saved',
-        __('Media Taxonomies settings saved.', 'verge-media-library'),
+        __('Media Taxonomies settings saved.', 'vergelabs-media-library'),
         'updated'
     );
 
@@ -172,7 +172,7 @@ function vergeml_lib_options_validate( $input ) {
     add_settings_error(
         'media-library',
         'eml_library_settings_saved',
-        __('Media Library settings saved.', 'verge-media-library'),
+        __('Media Library settings saved.', 'vergelabs-media-library'),
         'updated'
     );
 
@@ -369,11 +369,11 @@ function vergeml_restrict_manage_posts( $post_type, $which ) {
 
     if ( current_user_can( 'manage_options' ) && in_array( 'authors', $vergeml_lib_options['filters_to_show'] ) ) {
 
-        echo "<label for='author' class='screen-reader-text'>" . esc_html__( 'Filter by author', 'verge-media-library' ) . "</label>";
+        echo "<label for='author' class='screen-reader-text'>" . esc_html__( 'Filter by author', 'vergelabs-media-library' ) . "</label>";
 
         wp_dropdown_users(
             array(
-                'show_option_all'         => __( 'All Authors', 'verge-media-library' ),
+                'show_option_all'         => __( 'All Authors', 'vergelabs-media-library' ),
                 'name'                    => 'author',
                 'class'                   => 'attachment-filters',
                 'capability'              => 'upload_files',
@@ -390,15 +390,15 @@ function vergeml_restrict_manage_posts( $post_type, $which ) {
             if ( ! (bool) $vergeml_taxonomies[$taxonomy->name]['admin_filter'] )
                 continue;
 
-            echo "<label for='" . esc_attr( $taxonomy->name ) . "' class='screen-reader-text'>" . esc_html__( 'Filter by', 'verge-media-library' ) . ' ' . esc_html( $taxonomy->labels->name ) . "</label>";
+            echo "<label for='" . esc_attr( $taxonomy->name ) . "' class='screen-reader-text'>" . esc_html__( 'Filter by', 'vergelabs-media-library' ) . ' ' . esc_html( $taxonomy->labels->name ) . "</label>";
 
             $selected = ( ! $uncategorized && isset( $wp_query->query[$taxonomy->name] ) ) ? $wp_query->query[$taxonomy->name] : 0;
 
             wp_dropdown_categories(
                 array(
-                    'show_option_all'    =>  __( 'Filter by', 'verge-media-library' ) . ' ' . esc_html($taxonomy->labels->name),
-                    'show_option_in'     =>  '— ' . __( 'All', 'verge-media-library' ) . ' ' . esc_html($taxonomy->labels->name) . ' —',
-                    'show_option_not_in' =>  '— ' . __( 'Not in', 'verge-media-library' ) . ' ' . esc_html($taxonomy->labels->name) . ' —',
+                    'show_option_all'    =>  __( 'Filter by', 'vergelabs-media-library' ) . ' ' . esc_html($taxonomy->labels->name),
+                    'show_option_in'     =>  '— ' . __( 'All', 'vergelabs-media-library' ) . ' ' . esc_html($taxonomy->labels->name) . ' —',
+                    'show_option_not_in' =>  '— ' . __( 'Not in', 'vergelabs-media-library' ) . ' ' . esc_html($taxonomy->labels->name) . ' —',
                     'taxonomy'           =>  $taxonomy->name,
                     'name'               =>  $taxonomy->name,
                     'orderby'            =>  'name',
@@ -729,10 +729,10 @@ function vergeml_attachment_fields_to_edit( $form_fields, $post ) {
 
                     $not_found = sprintf(
                         /* translators: %s: name of a taxonomy, for example "Media Categories" */
-                        esc_html__( 'No %s found.', 'verge-media-library' ),
+                        esc_html__( 'No %s found.', 'vergelabs-media-library' ),
                         esc_html( $t['label'] )
                     );
-                    $html = '<ul class="term-list"><li>' . $not_found . ' <a href="' . esc_url( admin_url( '/edit-tags.php?taxonomy=' . $taxonomy . '&post_type=attachment' ) ) . '">' . esc_html__( 'Add some', 'verge-media-library' ) . '.</a></li></ul>';
+                    $html = '<ul class="term-list"><li>' . $not_found . ' <a href="' . esc_url( admin_url( '/edit-tags.php?taxonomy=' . $taxonomy . '&post_type=attachment' ) ) . '">' . esc_html__( 'Add some', 'vergelabs-media-library' ) . '.</a></li></ul>';
                 }
 
             ob_end_clean();

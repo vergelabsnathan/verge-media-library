@@ -1,14 +1,14 @@
 <?php
 /*
-Plugin Name: Verge Media Library
-Plugin URI: https://github.com/vergelabsnathan/verge-media-library
+Plugin Name: VergeLabs Media Library
+Plugin URI: https://github.com/vergelabsnathan/vergelabs-media-library
 Description: Categories, tags and custom taxonomies for the media library, MIME type management, and configurable media grid filters.
 Version: 2.9.8
 Requires at least: 6.5
 Requires PHP: 7.4
 Author: VergeLabs
 Author URI: https://github.com/vergelabsnathan
-Text Domain: verge-media-library
+Text Domain: vergelabs-media-library
 Domain Path: /languages
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/old-licenses/gpl-2.0.html
@@ -460,8 +460,8 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             $media_list_l10n = array(
                 // phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only: the list view rebuilds its own filter links from the current query string.
                 '$_GET'             => wp_json_encode( map_deep( wp_unslash( $_GET ), 'sanitize_text_field' ) ),
-                'uncategorized'     => __( 'All Uncategorized', 'verge-media-library' ),
-                'reset_all_filters' => __( 'Reset All Filters', 'verge-media-library' ),
+                'uncategorized'     => __( 'All Uncategorized', 'vergelabs-media-library' ),
+                'reset_all_filters' => __( 'Reset All Filters', 'vergelabs-media-library' ),
                 'filters_to_show'   => $vergeml_lib_options ? array_map( 'sanitize_key', $vergeml_lib_options['filters_to_show'] ) : array(
                     'types',
                     'dates',
@@ -674,21 +674,21 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
                 'taxonomies'
             ),
             'users'                     => $users_ready_for_script,
-            'uncategorized'             => __( 'All Uncategorized', 'verge-media-library' ),
-            'filter_by'                 => __( 'Filter by', 'verge-media-library' ),
-            'in'                        => __( 'All', 'verge-media-library' ),
-            'not_in'                    => __( 'Not in', 'verge-media-library' ),
-            'reset_filters'             => __( 'Reset All Filters', 'verge-media-library' ),
-            'author'                    => __( 'author', 'verge-media-library' ),
-            'authors'                   => __( 'authors', 'verge-media-library' ),
+            'uncategorized'             => __( 'All Uncategorized', 'vergelabs-media-library' ),
+            'filter_by'                 => __( 'Filter by', 'vergelabs-media-library' ),
+            'in'                        => __( 'All', 'vergelabs-media-library' ),
+            'not_in'                    => __( 'Not in', 'vergelabs-media-library' ),
+            'reset_filters'             => __( 'Reset All Filters', 'vergelabs-media-library' ),
+            'author'                    => __( 'author', 'vergelabs-media-library' ),
+            'authors'                   => __( 'authors', 'vergelabs-media-library' ),
             'current_screen'            => isset( $current_screen ) ? $current_screen->id : '',
 
-            'saveButton_success'        => __( 'Saved.', 'verge-media-library' ),
-            'saveButton_failure'        => __( 'Something went wrong.', 'verge-media-library' ),
-            'saveButton_text'           => __( 'Save Changes', 'verge-media-library' ),
+            'saveButton_success'        => __( 'Saved.', 'vergelabs-media-library' ),
+            'saveButton_failure'        => __( 'Something went wrong.', 'vergelabs-media-library' ),
+            'saveButton_text'           => __( 'Save Changes', 'vergelabs-media-library' ),
 
-            'select_all'                => __( 'Select All', 'verge-media-library' ),
-            'deselect'                  => __( 'Deselect ', 'verge-media-library'),
+            'select_all'                => __( 'Select All', 'vergelabs-media-library' ),
+            'deselect'                  => __( 'Deselect ', 'vergelabs-media-library'),
             'grid_sidebar_width'        => (int) $vergeml_lib_options['grid_sidebar_width'],
             'ideal_column_width'        => (int) $vergeml_lib_options['ideal_column_width'],
         );
@@ -719,8 +719,8 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             );
 
             $enhanced_medialist_l10n = array(
-                'uploaded_to' => __( 'Uploaded to post #', 'verge-media-library' ),
-                'based_on' => __( 'Based On', 'verge-media-library' )
+                'uploaded_to' => __( 'Uploaded to post #', 'vergelabs-media-library' ),
+                'based_on' => __( 'Based On', 'vergelabs-media-library' )
             );
 
             wp_localize_script(
@@ -754,8 +754,8 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
                 'grid_show_caption' => (int) $vergeml_lib_options['grid_show_caption'],
                 'grid_caption_type' => isset( $vergeml_lib_options['grid_caption_type'] ) ? sanitize_key( $vergeml_lib_options['grid_caption_type'] ) : 'title',
                 'ideal_column_width' => (int) $vergeml_lib_options['ideal_column_width'],
-                'more_details' => __( 'More Details', 'verge-media-library' ),
-                'less_details' => __( 'Less Details', 'verge-media-library' )
+                'more_details' => __( 'More Details', 'vergelabs-media-library' ),
+                'less_details' => __( 'Less Details', 'vergelabs-media-library' )
             );
 
             wp_localize_script(
@@ -792,18 +792,18 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
                     'eml_media' => 1,
 
                     'labels' => array(
-                        'name' => __( 'Media Categories', 'verge-media-library' ),
-                        'singular_name' => __( 'Media Category', 'verge-media-library' ),
-                        'menu_name' => __( 'Media Categories', 'verge-media-library' ),
-                        'all_items' => __( 'All Media Categories', 'verge-media-library' ),
-                        'edit_item' => __( 'Edit Media Category', 'verge-media-library' ),
-                        'view_item' => __( 'View Media Category', 'verge-media-library' ),
-                        'update_item' => __( 'Update Media Category', 'verge-media-library' ),
-                        'add_new_item' => __( 'Add New Media Category', 'verge-media-library' ),
-                        'new_item_name' => __( 'New Media Category Name', 'verge-media-library' ),
-                        'parent_item' => __( 'Parent Media Category', 'verge-media-library' ),
-                        'parent_item_colon' => __( 'Parent Media Category:', 'verge-media-library' ),
-                        'search_items' => __( 'Search Media Categories', 'verge-media-library' )
+                        'name' => __( 'Media Categories', 'vergelabs-media-library' ),
+                        'singular_name' => __( 'Media Category', 'vergelabs-media-library' ),
+                        'menu_name' => __( 'Media Categories', 'vergelabs-media-library' ),
+                        'all_items' => __( 'All Media Categories', 'vergelabs-media-library' ),
+                        'edit_item' => __( 'Edit Media Category', 'vergelabs-media-library' ),
+                        'view_item' => __( 'View Media Category', 'vergelabs-media-library' ),
+                        'update_item' => __( 'Update Media Category', 'vergelabs-media-library' ),
+                        'add_new_item' => __( 'Add New Media Category', 'vergelabs-media-library' ),
+                        'new_item_name' => __( 'New Media Category Name', 'vergelabs-media-library' ),
+                        'parent_item' => __( 'Parent Media Category', 'vergelabs-media-library' ),
+                        'parent_item_colon' => __( 'Parent Media Category:', 'vergelabs-media-library' ),
+                        'search_items' => __( 'Search Media Categories', 'vergelabs-media-library' )
                     ),
 
                     'hierarchical' => 1,
@@ -998,10 +998,10 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
         $settings_page = is_network_admin() ? 'settings.php' : 'options-general.php';
 
         if ( ! is_network_admin() ) {
-            $custom_links['settings'] = '<a href="' . self_admin_url($settings_page.'?page=media') . '">' . __( 'Media Settings', 'verge-media-library' ) . '</a>';
+            $custom_links['settings'] = '<a href="' . self_admin_url($settings_page.'?page=media') . '">' . __( 'Media Settings', 'vergelabs-media-library' ) . '</a>';
         }
 
-        $custom_links['utility'] = '<a href="' . self_admin_url($settings_page.'?page=eml-settings') . '">' . __( 'Utilities', 'verge-media-library' ) . '</a>';
+        $custom_links['utility'] = '<a href="' . self_admin_url($settings_page.'?page=eml-settings') . '">' . __( 'Utilities', 'vergelabs-media-library' ) . '</a>';
 
         return array_merge( $custom_links, $actions );
     }
@@ -1021,15 +1021,15 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             return $plugin_meta;
         }
 
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/documents/enhanced-media-library" target="_blank">' . __( 'Docs', 'verge-media-library' ) . '</a>';
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/support" target="_blank">' . __( 'Support', 'verge-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="https://wpuxsolutions.com/documents/enhanced-media-library" target="_blank">' . __( 'Docs', 'vergelabs-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="https://wpuxsolutions.com/support" target="_blank">' . __( 'Support', 'vergelabs-media-library' ) . '</a>';
 
         if ( ! defined( 'EML_IS_PRO' ) ) {
 
-            $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-pro" class="eml-pro" target="_blank">' . __( 'Go PRO', 'verge-media-library' ) . '</a>';
+            $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-pro" class="eml-pro" target="_blank">' . __( 'Go PRO', 'vergelabs-media-library' ) . '</a>';
         }
 
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-3-0" class="eml-pro" target="_blank">' . __( '3.0 Beta', 'verge-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-3-0" class="eml-pro" target="_blank">' . __( '3.0 Beta', 'vergelabs-media-library' ) . '</a>';
 
         return $plugin_meta;
     }

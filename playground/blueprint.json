@@ -11,7 +11,7 @@
 			"step": "installPlugin",
 			"pluginData": {
 				"resource": "url",
-				"url": "https://raw.githubusercontent.com/vergelabsnathan/verge-media-library/main/playground/verge-media-library.zip"
+				"url": "https://raw.githubusercontent.com/vergelabsnathan/vergelabs-media-library/main/playground/vergelabs-media-library.zip"
 			},
 			"options": {
 				"activate": true

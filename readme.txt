@@ -1,4 +1,4 @@
-=== Verge Media Library ===
+=== VergeLabs Media Library ===
 Contributors: vergelabsnathan
 Tags: media library, media folders, media tags, media categories, mime types
 Requires at least: 6.5
@@ -14,11 +14,11 @@ Categories, tags and custom taxonomies for the media library. A maintained fork 
 
 **Handy for those who need to manage a lot of media files.**
 
-Verge Media Library is a maintained fork of [Enhanced Media Library](https://wordpress.org/plugins/enhanced-media-library/) by wpUXsolutions, which has had no release since July 2024. It repairs the media toolbar on WordPress 7.0 and clears the PHP 8 warnings. Everything else is the plugin you already know.
+VergeLabs Media Library is a maintained fork of [Enhanced Media Library](https://wordpress.org/plugins/enhanced-media-library/) by wpUXsolutions, which has had no release since July 2024. It repairs the media toolbar on WordPress 7.0 and clears the PHP 8 warnings. Everything else is the plugin you already know.
 
 Based on Enhanced Media Library by wpUXsolutions, and licensed GPLv2 or later as the original is.
 
-[Source and issue tracker](https://github.com/vergelabsnathan/verge-media-library)
+[Source and issue tracker](https://github.com/vergelabsnathan/vergelabs-media-library)
 
 
 ### What this fork fixes ###
@@ -179,7 +179,7 @@ No. The original polled its author's server twice a day for admin notices and pr
 
 = Where do I report a problem? =
 
-On the [issue tracker](https://github.com/vergelabsnathan/verge-media-library/issues).
+On the [issue tracker](https://github.com/vergelabsnathan/vergelabs-media-library/issues).
 
 
 
@@ -249,7 +249,7 @@ On the [issue tracker](https://github.com/vergelabsnathan/verge-media-library/is
 * Admin menu and page titles still read "Enhanced Media Library Utilities" and "EML Utilities".
 
 ### 2.9.5 ###
-*First release of the Verge Media Library fork*
+*First release of the VergeLabs Media Library fork*
 
 = Bugfixes =
 * Media toolbar layout repaired on WordPress 7.0. Core made `.media-toolbar-secondary` a fixed 2x2 CSS grid and placed only its own two filters explicitly; every control this plugin adds fell into implicit auto-placement and stacked below the toolbar with labels attached to the wrong controls. Measured on WP 7.0.4, the toolbar goes from 300px and six grid rows back to 66px and two.

@@ -43,7 +43,7 @@ That is the only thing between this and a submission.
    Check flags as hidden and compressed files. The built archive contains none of them.
 
 ```
-git archive --format=zip --prefix=verge-media-library/ -o dist/verge-media-library-<version>.zip HEAD
+git archive --format=zip --prefix=vergelabs-media-library/ -o dist/vergelabs-media-library-<version>.zip HEAD
 ```
 
 3. Screenshots live in the SVN `assets/` directory, not inside the plugin zip. The six

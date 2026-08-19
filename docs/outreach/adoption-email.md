@@ -22,7 +22,7 @@ I've also cleared the PHP 8 warnings. The four settings handlers read their nonc
 One thing you'll want regardless of what you decide: `wpuxss_eml_apply_settings_to_network` checks a nonce but no capability, and it writes options into every site on a network. It isn't cleanly exploitable, since the nonce is only printed on a super-admin screen, but it should require `manage_network_options`.
 
 The patches are here, GPLv2, attributed to you, and yours to take with no conditions:
-https://github.com/vergelabsnathan/verge-media-library
+https://github.com/vergelabsnathan/vergelabs-media-library
 
 If you'd like to keep ownership and just want the fixes, say the word and I'll send them however suits you — a diff, a PR, or SVN patches. If you'd rather hand the plugin on, I'm willing to take over maintenance and would keep it free and GPL.
 
@@ -52,7 +52,7 @@ I emailed the author at wpUXsolutions@gmail.com on <DATE> offering the patches o
 
 I have already fixed the outstanding issues and published the work under GPLv2 with attribution to the original author:
 
-- Repository: https://github.com/vergelabsnathan/verge-media-library
+- Repository: https://github.com/vergelabsnathan/vergelabs-media-library
 - Try it in the browser: <PLAYGROUND_URL>
 
 Fixed: the WordPress 7.0 media toolbar layout, a duplicate element id that made the author filter overlap the type filter, the PHP 8 undefined-array-key warnings in the four settings handlers, and four deprecated `get_terms()` calls. I also added a missing `manage_network_options` capability check to the AJAX handler that writes options across a multisite network — I'd flag that one for your attention whatever the outcome of this request.

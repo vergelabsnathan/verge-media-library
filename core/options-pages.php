@@ -1938,6 +1938,34 @@ function vergeml_print_media_library_options() {
                                 <table class="form-table">
 
                                     <tr>
+                                        <th scope="row"><?php esc_html_e( 'Search in', 'vergelabs-media-library' ); ?></th>
+                                        <td>
+                                            <fieldset id="vergeml_lib_options_search_in">
+                                                <legend class="screen-reader-text"><span><?php esc_html_e( 'Search in', 'vergelabs-media-library' ); ?></span></legend>
+                                                <input name="vergeml_lib_options[search_in][]" type="hidden" value="none" />
+<?php
+                                                $vergeml_search_fields = array(
+                                                    'titles'       => __( 'Titles', 'vergelabs-media-library' ),
+                                                    'captions'     => __( 'Captions', 'vergelabs-media-library' ),
+                                                    'descriptions' => __( 'Descriptions', 'vergelabs-media-library' ),
+                                                    'filenames'    => __( 'Filenames', 'vergelabs-media-library' ),
+                                                    'authors'      => __( 'Authors', 'vergelabs-media-library' ),
+                                                    'taxonomies'   => __( 'Media taxonomies', 'vergelabs-media-library' ),
+                                                );
+
+                                                foreach ( $vergeml_search_fields as $vergeml_field => $vergeml_label ) :
+?>
+                                                <label><input name="vergeml_lib_options[search_in][]" type="checkbox" value="<?php echo esc_attr( $vergeml_field ); ?>" class="search_columns" <?php checked( in_array( $vergeml_field, (array) $vergeml_lib_options['search_in'], true ) ); ?> /> <?php echo esc_html( $vergeml_label ); ?></label><br />
+<?php
+                                                endforeach;
+?>
+                                                <p class="description"><?php esc_html_e( 'WordPress searches titles, captions and descriptions. The rest is added by this plugin.', 'vergelabs-media-library' ); ?></p>
+                                                <p class="description"><?php esc_html_e( 'Searching taxonomies finds an item by the name of a category or tag it is filed under. Every word you type has to match something, though not all in the same field.', 'vergelabs-media-library' ); ?></p>
+                                            </fieldset>
+                                        </td>
+                                    </tr>
+
+                                    <tr>
                                         <th scope="row"><?php esc_html_e('Search on enter','vergelabs-media-library'); ?></th>
                                         <td>
                                             <fieldset>

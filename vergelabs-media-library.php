@@ -1057,6 +1057,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
     include_once( 'core/taxonomies.php' );
     include_once( 'core/media-templates.php' );
     include_once( 'core/compatibility.php' );
+    include_once( 'core/search.php' );
 
     if ( vergeml_enhance_media_shortcodes() ) {
         include_once( 'core/medialist.php' );

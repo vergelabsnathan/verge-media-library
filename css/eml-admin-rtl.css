@@ -124,20 +124,20 @@ a.eml-pro {
     margin: 20px 0 0;
 }
 
-#vergeml-global-options-wrap .postbox#wpuxss-credits {
+#vergeml-global-options-wrap .postbox#vergeml-credits {
     background-color: #fff !important;
 }
-#wpuxss-credits .author {
+#vergeml-credits .author {
     font-style: italic;
     margin: 30px 0 0;
     padding: 10px 0 5px;
     border-top: 1px solid #e0e5e9;
 }
-#wpuxss-credits .logo-webbistro {
+#vergeml-credits .logo-webbistro {
     font-style: italic;
     text-decoration: none;
 }
-#wpuxss-credits .icon-webbistro {
+#vergeml-credits .icon-webbistro {
     font-family: 'webbistro';
     speak: none;
     font-style: normal;
@@ -147,30 +147,30 @@ a.eml-pro {
     line-height: 1;
     -webkit-font-smoothing: antialiased;
 }
-#wpuxss-credits h4 {
+#vergeml-credits h4 {
     margin: 20px 0 4px;
 }
-#wpuxss-credits p,
-#wpuxss-credits ul {
+#vergeml-credits p,
+#vergeml-credits ul {
     margin-top: 0;
 }
-#wpuxss-credits li {
+#vergeml-credits li {
     list-style: disc;
     margin-right: 1.4em;
 }
-#wpuxss-credits .button-primary {
+#vergeml-credits .button-primary {
     background-color: #1ace0d;
     border-color: #139a09;
 }
-#wpuxss-credits .button-primary:hover {
+#vergeml-credits .button-primary:hover {
     background: #1dbb11;
     border-color: #127d0a;
     color: #e4ffe2;
 }
-#wpuxss-credits .button-primary:focus {
+#vergeml-credits .button-primary:focus {
     box-shadow: 0 0 0 1px #fff, 0 0 0 3px #1dbb11;
 }
-#wpuxss-credits .button-primary span {
+#vergeml-credits .button-primary span {
     font-weight: bold;
 }
 

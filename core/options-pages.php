@@ -1732,7 +1732,7 @@ function vergeml_get_settings() {
 function vergeml_print_media_library_options() {
 
     if ( ! current_user_can( 'manage_options' ) )
-        wp_die( __( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
 
     if ( is_multisite() ) {
 
@@ -1803,7 +1803,7 @@ function vergeml_print_media_library_options() {
                                             <fieldset>
                                                 <legend class="screen-reader-text"><span><?php esc_html_e('Show count','verge-media-library'); ?></span></legend>
                                                 <label><input name="vergeml_lib_options[show_count]" type="hidden" value="0" /><input name="vergeml_lib_options[show_count]" type="checkbox" value="1" <?php checked( true, (bool) $vergeml_lib_options['show_count'], true ); ?> /> <?php esc_html_e('Show item count per category for media filters','verge-media-library'); ?></label>
-                                                <p class="description"><?php esc_html_e( 'Disable this if it slows down your site admin. The problem is resolved in the upcoming major update v3.0', 'verge-media-library' ); ?></p>
+                                                <p class="description"><?php esc_html_e( 'Counting items per category costs a query per term, so turn this off if your admin feels slow on a large library.', 'verge-media-library' ); ?></p>
                                             </fieldset>
                                         </td>
                                     </tr>
@@ -2071,17 +2071,14 @@ function vergeml_print_media_library_options() {
                                                 <p class="description"><?php
                                                 printf(
                                                     '<strong style="color:red">%s!</strong> ',
-                                                    __( 'Warning', 'verge-media-library' )
+                                                    esc_html__( 'Warning', 'verge-media-library' )
                                                 );
-                                                printf(
-                                                    __( 'Incompatibility with other gallery plugins or themes possible! <a href="%s">Learn more</a>.', 'verge-media-library' ),
-                                                    esc_url('https://wpuxsolutions.com/documents/enhanced-media-library/enhanced-gallery-possible-conflicts/')
-                                                );
+                                                esc_html_e( 'Other gallery plugins and some themes replace the default gallery, and enabling this can conflict with them.', 'verge-media-library' );
                                                 echo ' ';
                                                 printf(
-                                                    __( 'Please check out your gallery front-end and back-end functionality once this option activated. If you find an issue please inform plugin authors at %s or %s.', 'verge-media-library' ),
-                                                    '<a href="https://wordpress.org/support/plugin/enhanced-media-library">wordpress.org</a>',
-                                                    '<a href="https://wpuxsolutions.com/support/create-new-ticket/">wpuxsolutions.com</a>'
+                                                    /* translators: %s: link to the plugin's issue tracker */
+                                                    esc_html__( 'Check your galleries on the front end and in the editor once this is on, and report anything broken at %s.', 'verge-media-library' ),
+                                                    '<a href="' . esc_url( 'https://github.com/vergelabsnathan/verge-media-library/issues' ) . '">GitHub</a>'
                                                 ); ?></p>
                                             </fieldset>
                                         </td>
@@ -2120,7 +2117,7 @@ function vergeml_print_media_library_options() {
 function vergeml_print_taxonomies_options() {
 
     if ( ! current_user_can( 'manage_options' ) )
-        wp_die( __( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
+        wp_die( esc_html__( 'You do not have sufficient permissions to access this page.', 'verge-media-library' ) );
 
     if ( is_multisite() ) {
 
@@ -2286,7 +2283,10 @@ function vergeml_print_taxonomies_options() {
                                 <?php if ( ! empty( $html ) ) : ?>
 
                                     <ul class="vergeml-settings-list vergeml-media-taxonomy-list">
-                                        <?php echo $html; ?>
+                                        <?php
+                                        // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- assembled above from esc_attr() and esc_html() parts plus literal form markup, which wp_kses would strip.
+                                        echo $html;
+                                        ?>
                                     </ul>
                                     <div class="vergeml-button-container-right"><a class="add-new-h2 vergeml-button-create-taxonomy" href="javascript:;">+ <?php esc_html_e( 'Add New Taxonomy', 'verge-media-library' ); ?></a></div>
                                 <?php endif; ?>
@@ -2357,7 +2357,10 @@ function vergeml_print_taxonomies_options() {
 
                                                 <h4><?php echo esc_html($post_type->label); ?></h4>
                                                 <ul class="vergeml-settings-list vergeml-non-media-taxonomy-list">
-                                                    <?php echo $html; ?>
+                                                    <?php
+                                                    // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- assembled above from esc_attr() and esc_html() parts plus literal form markup, which wp_kses would strip.
+                                                    echo $html;
+                                                    ?>
                                                 </ul>
 
                                             <?php endif;
@@ -2476,14 +2479,14 @@ function vergeml_print_mimetypes_options() {
             '</strong>',
             '<br />'
         );
-        $w_link = __( 'Report a filetype', 'verge-media-library' );
         printf(
             '<div class="notice notice-news eml-admin-notice dashicons-before">
                 <p>%1$s</p>
-                <a href="https://wpuxsolutions.com/support" target="_blank" class="button button-primary">%2$s</a>
+                <a href="%2$s" target="_blank" class="button button-primary">%3$s</a>
             </div>',
-            $warning,
-            $w_link
+            wp_kses_post( $warning ),
+            esc_url( 'https://github.com/vergelabsnathan/verge-media-library/issues' ),
+            esc_html__( 'Report a filetype', 'verge-media-library' )
         );
         ?>
 
@@ -2530,7 +2533,7 @@ function vergeml_print_mimetypes_options() {
                                     $allowed = (bool) $vergeml_mimes[$type]['upload']; ?>
 
                                     <tr>
-                                    <td id="<?php echo esc_attr($type); ?>"><?php echo $label; ?></td>
+                                    <td id="<?php echo esc_attr( $type ); ?>"><?php echo wp_kses( $label, array( 'code' => array() ) ); ?></td>
                                     <td><code><?php echo esc_html($mime); ?></code><input type="hidden" class="vergeml-mime" name="vergeml_mimes[<?php echo esc_attr($type); ?>][mime]" value="<?php echo esc_html($vergeml_mimes[$type]['mime']); ?>" /></td>
                                     <td><input type="text" name="vergeml_mimes[<?php echo esc_attr($type); ?>][singular]" value="<?php echo esc_html($vergeml_mimes[$type]['singular']); ?>" /></td>
                                     <td><input type="text" name="vergeml_mimes[<?php echo esc_attr($type); ?>][plural]" value="<?php echo esc_html($vergeml_mimes[$type]['plural']); ?>" /></td>
@@ -2612,14 +2615,14 @@ function vergeml_print_mimetypes_buttons() { ?>
 
 function vergeml_print_credits() { ?>
 
-    <div class="postbox" id="wpuxss-credits">
+    <div class="postbox" id="vergeml-credits">
 
-        <h3 class="hndle">Enhanced Media Library <?php echo VERGEML_VERSION; ?></h3>
+        <h3 class="hndle">Verge Media Library <?php echo esc_html( VERGEML_VERSION ); ?></h3>
 
         <div class="inside">
 
             <h4><?php esc_html_e( 'Changelog', 'verge-media-library' ); ?></h4>
-            <p><?php esc_html_e( 'What\'s new in', 'verge-media-library' ); ?> <a href="https://github.com/vergelabsnathan/verge-media-library/releases"><?php esc_html_e( 'version', 'verge-media-library' ); echo ' ' . VERGEML_VERSION; ?></a>.</p>
+            <p><?php esc_html_e( 'What\'s new in', 'verge-media-library' ); ?> <a href="https://github.com/vergelabsnathan/verge-media-library/releases"><?php esc_html_e( 'version', 'verge-media-library' ); echo ' ' . esc_html( VERGEML_VERSION ); ?></a>.</p>
 
             <h4><?php esc_html_e( 'Support', 'verge-media-library' ); ?></h4>
             <p><?php esc_html_e( 'Report a problem on', 'verge-media-library' ); ?> <a href="https://github.com/vergelabsnathan/verge-media-library/issues">GitHub</a>.</p>

@@ -2408,14 +2408,33 @@ function vergeml_print_taxonomies_options() {
                                                 $html .= '<li><input type="checkbox" class="vergeml-media_popup_taxonomy_edit" name="vergeml_taxonomies[' . esc_attr($taxonomy->name) . '][media_popup_taxonomy_edit]" id="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-media_popup_taxonomy_edit" value="1" ' . checked( true, (bool) $vergeml_taxonomies[$taxonomy->name]['media_popup_taxonomy_edit'], false ) . ' /><label for="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-media_popup_taxonomy_edit">' . __('Edit in Media Popup','vergelabs-media-library') . '</label></li>';
 
                                                 /*
-                                                 *  An "Auto-assign media items to parent" checkbox and a
-                                                 *  "Synchronize Now" button sat here, permanently greyed
-                                                 *  out and labelled "/ Premium Feature". Neither did
-                                                 *  anything: taxonomy_auto_assign was stored but never
-                                                 *  read, and the synchronise request had no handler on
-                                                 *  this side. Both belong to the paid add-on, so they are
-                                                 *  gone rather than shipped as locked teasers.
+                                                 *  Auto-assign. This used to be greyed out and labelled
+                                                 *  "/ Premium Feature" with nothing behind it; it now
+                                                 *  works, see core/auto-assign.php. Only offered for a
+                                                 *  taxonomy the parent post type actually has, because a
+                                                 *  post cannot pass on terms of a taxonomy it lacks.
                                                  */
+
+                                                $vergeml_auto_assign_types = array();
+
+                                                foreach ( (array) $taxonomy->object_type as $vergeml_object_type ) {
+                                                    if ( 'attachment' === $vergeml_object_type )
+                                                        continue;
+                                                    $vergeml_pt = get_post_type_object( $vergeml_object_type );
+                                                    if ( $vergeml_pt )
+                                                        $vergeml_auto_assign_types[] = strtolower( $vergeml_pt->labels->singular_name );
+                                                }
+
+                                                if ( ! empty( $vergeml_auto_assign_types ) ) {
+
+                                                    $html .= '<li><input type="checkbox" class="vergeml-taxonomy_auto_assign" name="vergeml_taxonomies[' . esc_attr($taxonomy->name) . '][taxonomy_auto_assign]" id="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-taxonomy_auto_assign" value="1" ' . checked( true, (bool) $vergeml_taxonomies[$taxonomy->name]['taxonomy_auto_assign'], false ) . ' />';
+                                                    $html .= '<label for="vergeml_taxonomies-' . esc_attr($taxonomy->name) . '-taxonomy_auto_assign">' . sprintf(
+                                                        /* translators: 1: taxonomy name, for example "Categories", 2: post type name, for example "post" */
+                                                        esc_html__( 'On upload, give media the %1$s of the %2$s it was uploaded to', 'vergelabs-media-library' ),
+                                                        esc_html( $taxonomy->label ),
+                                                        esc_html( implode( ' / ', $vergeml_auto_assign_types ) )
+                                                    ) . '</label></li>';
+                                                }
 
                                                 $html .= '</ul>';
 

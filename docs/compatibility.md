@@ -43,9 +43,13 @@ Each plugin was activated alone, tested, and deactivated.
 | Smush | pass |
 | ShortPixel | pass |
 | Jetpack | pass (alone; see below) |
+| WPML (Sitepress) | pass |
+| WP Rocket 3.23.2.2 | pass |
+| Divi Builder 4.27.4 | pass (see note) |
 
 Then **fourteen of them activated together**, which is the configuration real
-sites are in: all nineteen checks pass. `debug.log` for the whole campaign
+sites are in: all nineteen checks pass. Divi Builder, WPML and WP Rocket
+together with this plugin also pass all nineteen. `debug.log` for the whole campaign
 contains six lines, none from this plugin — Smush exhausting memory in its own
 helper, a WooCommerce textdomain notice, and cron-schedule errors left by
 activating and deactivating plugins in a loop.
@@ -62,12 +66,23 @@ screens, Yoast's React `defaultProps` deprecation warning, and ShortPixel's
   bootstrap hangs — with this plugin switched off as well, so it is the sandbox
   and not a conflict. Jetpack passes when tested on its own. A stack test with
   Jetpack needs an environment with outbound network.
-- **Divi, WPML, WP Rocket.** Commercial; no licence available. WPML is the one
-  worth doing first: its media translation module duplicates attachments and
-  filters attachment queries, which is where this plugin's `posts_search` /
-  `posts_join` filters live. Divi ships its own media frame. WP Rocket
-  concatenates admin JavaScript.
 - **Multisite.** Single-site only so far.
+- **WPML's media translation add-on.** The base Sitepress plugin was tested;
+  the separate media translation module, which duplicates attachments, was not.
+- **Divi as a theme.** The Divi Builder *plugin* was tested. The Divi theme
+  extracted only partially here and is untested.
+
+## Divi Builder and `WP_DEBUG_DISPLAY`
+
+Divi Builder fails every check on a site with `WP_DEBUG_DISPLAY` on, including
+logging in — and it fails with this plugin deactivated too, so it is not a
+conflict. The chain: something loads a textdomain before `init`, WordPress
+prints a `_doing_it_wrong` notice, that output precedes the auth cookie, and
+`wp-login.php` then cannot set headers. With display off, which is how
+production runs, Divi Builder passes all nineteen checks alongside this plugin.
+
+Worth knowing because a developer running a debug site will see a broken login
+and reasonably suspect whichever plugin they installed last.
 
 ## Why this matters here
 

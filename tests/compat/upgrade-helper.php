@@ -16,6 +16,24 @@ if ( ! defined( 'ABSPATH' ) ) exit;
  *  a handler running inside init sees no media taxonomies at all and reports
  *  every term assignment as missing.
  */
+/*
+ *  ?vgml_rtl=1 renders the admin right-to-left, so the mirrored stylesheet can
+ *  actually be looked at. WordPress swaps in the -rtl.css file when is_rtl() is
+ *  true, and is_rtl() just reads the locale's text direction -- no language
+ *  pack needed to exercise the layout.
+ */
+if ( isset( $_GET['vgml_rtl'] ) ) {
+
+    add_action( 'init', function () {
+        if ( isset( $GLOBALS['wp_locale'] ) )
+            $GLOBALS['wp_locale']->text_direction = 'rtl';
+    }, 1 );
+
+    add_filter( 'language_attributes', function ( $output ) {
+        return false === strpos( $output, 'dir=' ) ? $output . ' dir="rtl"' : str_replace( 'dir="ltr"', 'dir="rtl"', $output );
+    } );
+}
+
 add_action( 'wp_loaded', function () {
 
     if ( ! isset( $_GET['vgml_test'] ) )

@@ -4,7 +4,7 @@ Tags: media library, media folders, media tags, media categories, mime types
 Requires at least: 6.5
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.9.8
+Stable tag: 2.10.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -200,6 +200,24 @@ On the [issue tracker](https://github.com/vergelabsnathan/vergelabs-media-librar
 
 
 ## Changelog ##
+
+### 2.10.0 ###
+*The three paid features, rebuilt and free*
+
+= Added =
+* **Search by filename, uploader and category.** WordPress searches titles, captions and descriptions. This adds the rest, and lets you switch each column off — searching a category name finds everything filed under it, whether or not the name appears in the file. Every word has to match something, though not necessarily the same field.
+* **New uploads inherit the post's categories.** Turn it on per taxonomy, and a file uploaded while editing a post is filed under that post's terms automatically. Terms are added, never replaced, so nothing you set by hand is overwritten.
+* **Bulk categorise from the media list.** Two entries in the Bulk actions menu — add to, or remove from, the category picked beside it. Built on WordPress's own bulk-action handling, so it keeps working when the list table changes. Files you cannot edit are skipped and counted, rather than silently ignored.
+
+All three were previously sold as part of a paid add-on. Nothing here phones home, and there is nothing to buy.
+
+= Changed =
+* The plugin is now VergeLabs Media Library. Your existing settings are copied across on activation and the originals are left untouched, so nothing is lost if you go back.
+* A pass over the settings screens to sit with how the WordPress admin looks now, using core's own greys, borders and button shapes. The row actions used to be absolutely positioned at fixed offsets, so a long or translated taxonomy name slid underneath them; they sit in the flow now, and the edit panel opens underneath the label it belongs to.
+
+= Compatibility =
+* Tested alongside Elementor, WooCommerce, Advanced Custom Fields, Beaver Builder, Divi Builder, Jetpack, Polylang, WPML, Yoast SEO, Rank Math, WP Rocket, LiteSpeed Cache, FooGallery, MetaSlider, NextGEN Gallery, Smush, ShortPixel and Classic Editor — each on its own, and fourteen of them at once.
+* Upgrading from Enhanced Media Library is covered by its own tests: settings, taxonomies, custom file types and every category assignment are carried over unchanged, and the site survives both plugins being active at the same time.
 
 ### 2.9.8 ###
 *Security, privacy and review readiness*

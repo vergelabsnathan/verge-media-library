@@ -120,8 +120,12 @@ a.eml-pro {
 #vergeml-global-options-wrap .postbox ul {
     margin-bottom: 25px;
 }
+/*  Two ids, so this outranks the panel styling further down the file no matter
+    how many classes that carries. The gap it used to open under every panel
+    heading now comes from the .inside padding instead. */
+
 #vergeml-global-options-wrap #poststuff .inside {
-    margin: 20px 0 0;
+    margin: 0;
 }
 
 #vergeml-global-options-wrap .postbox#vergeml-credits {
@@ -528,4 +532,183 @@ a.eml-pro {
 .eml-admin-notice.notice.notice-warning .button:active {
     background-color: #f21600;
     border-color: #f21600;
+}
+
+
+
+
+/* == Settings shell == */
+
+/*  A pass over the settings screens to sit with how the WordPress admin looks
+    now, without inventing a look of our own: core's greys, core's border
+    weights, core's button shapes. These screens should read as part of the
+    admin rather than as a guest in it.
+
+    The substantive change is structural. The row actions used to be absolutely
+    positioned pills with a soft drop shadow, pinned at fixed pixel offsets, so
+    a long taxonomy name slid underneath them and a translated label could
+    overlap. They are in the flow now. */
+
+.wrap.eml-options #poststuff h2 {
+    font-size: 20px;
+    font-weight: 600;
+    line-height: 1.3;
+    color: #1d2327;
+    margin: 34px 0 12px;
+    padding: 0;
+}
+
+.wrap.eml-options #poststuff h2:first-of-type {
+    margin-top: 6px;
+}
+
+.wrap.eml-options .postbox {
+    border: 1px solid #dcdcde;
+    box-shadow: none;
+}
+
+/*  #poststuff is repeated here on purpose. Core styles the panel body through
+    an id selector, and an id outranks any number of classes -- without it this
+    rule is simply ignored. */
+
+.wrap.eml-options .postbox > .inside,
+.wrap.eml-options #poststuff .postbox > .inside {
+    padding: 20px;
+    margin: 0;
+}
+
+.wrap.eml-options .postbox h4 {
+    font-size: 12px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #50575e;
+    margin: 0 0 10px;
+}
+
+.wrap.eml-options .form-table th {
+    padding: 18px 0 18px 10px;
+}
+
+.wrap.eml-options .form-table td {
+    padding: 14px 10px;
+}
+
+.wrap.eml-options p.description {
+    font-style: normal;
+    color: #50575e;
+    margin-top: 6px;
+}
+
+
+/*  Settings rows. Flex rather than absolute positioning, and the edit panel
+    gets a full-width row of its own so it opens underneath the label it
+    belongs to instead of beside it. */
+
+.vergeml-settings-list {
+    border-top: 1px solid #dcdcde;
+    margin-top: 14px;
+}
+
+.vergeml-settings-list > li {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+    padding: 12px 10px;
+    margin: 0;
+    position: static;
+    overflow: visible;
+    border-bottom: 1px solid #f0f0f1;
+}
+
+.vergeml-settings-list > li:hover {
+    background: #f6f7f7;
+}
+
+.vergeml-settings-list > li > label {
+    flex: 1 1 auto;
+    margin: 0;
+    font-size: 14px;
+    color: #1d2327;
+}
+
+.vergeml-settings-list > li > .vergeml-taxonomy-edit {
+    flex: 1 0 100%;
+    margin-top: 6px;
+    padding-top: 14px;
+    border-top: 1px solid #f0f0f1;
+}
+
+/*  Row actions shaped like a core small button, so they read as buttons rather
+    than as decorated links. */
+
+.vergeml-settings-list > li .vergeml-button-edit,
+.vergeml-settings-list.vergeml-non-media-taxonomy-list > li .vergeml-button-edit,
+.vergeml-settings-list > li .vergeml-button-remove {
+    position: static;
+    right: auto;
+    left: auto;
+    top: auto;
+    flex: 0 0 auto;
+}
+
+.vergeml-settings-list > li .vergeml-button-edit {
+    height: auto;
+    line-height: 1.9;
+    padding: 0 10px;
+    border: 1px solid #c3c4c7;
+    border-radius: 3px;
+    box-shadow: none;
+    background: #f6f7f7;
+    color: #2c3338;
+    font-size: 12px;
+    text-decoration: none;
+}
+
+.vergeml-settings-list > li .vergeml-button-edit:hover,
+.vergeml-settings-list > li .vergeml-button-edit:focus {
+    background: #f0f0f1;
+    border-color: #8c8f94;
+    color: #1d2327;
+}
+
+.vergeml-settings-list > li .vergeml-button-edit:focus-visible,
+.vergeml-settings-list > li .vergeml-button-remove:focus-visible {
+    outline: 2px solid #2271b1;
+    outline-offset: 1px;
+}
+
+/*  The assign checkbox. The markup puts the label text in a <span> straight
+    after the input with no whitespace between them, so the gap has to come
+    from here -- zeroing this margin jams the two together. */
+
+.vergeml-settings-list .vergeml-assigned {
+    margin: 0 0 0 8px;
+}
+
+
+/*  The bulk term picker sits between core's Bulk actions menu and its Apply
+    button, so it should not tower over either. */
+
+#vergeml_bulk_term {
+    max-width: 15rem;
+    vertical-align: baseline;
+}
+
+
+@media screen and (max-width: 782px) {
+
+    .vergeml-settings-list > li {
+        padding: 14px 8px;
+    }
+
+    .wrap.eml-options .postbox > .inside {
+        padding: 16px;
+    }
+
+    #vergeml_bulk_term {
+        max-width: 100%;
+        margin-bottom: 8px;
+    }
 }

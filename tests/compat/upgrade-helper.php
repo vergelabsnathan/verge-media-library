@@ -213,6 +213,25 @@ add_action( 'wp_loaded', function () {
         $out['attachments'] = $ids;
     }
 
+    elseif ( 'plugins' === $action ) {
+        $out['installed'] = array_keys( get_plugins() );
+    }
+
+    /*
+     *  Turns every search column and filter on. Used to prove that a search
+     *  returning nothing was the column being switched off rather than the
+     *  search being broken.
+     */
+    elseif ( 'enable_all_search' === $action ) {
+
+        $lib = get_option( 'vergeml_lib_options', array() );
+        $lib['search_in']       = array( 'titles', 'captions', 'descriptions', 'filenames', 'authors', 'taxonomies' );
+        $lib['filters_to_show'] = array( 'types', 'dates', 'authors', 'taxonomies' );
+        update_option( 'vergeml_lib_options', $lib );
+
+        $out['search_in'] = $lib['search_in'];
+    }
+
     /*
      *  The comparison surface: both option sets, plus the term assignments,
      *  because options surviving while every file loses its category would

@@ -1,15 +1,17 @@
 # Submitting to WordPress.org
 
-State of the gate as of 2.9.8. Everything here has been run, not assumed.
+State of the gate as of 2.10.0. Everything here has been run, not assumed.
 
 ## Done
 
 | Requirement | State |
 |---|---|
-| `wp plugin check` errors | **0** |
-| `wp plugin check` warnings | **0** |
+| Plugin Check errors | **0** |
+| Plugin Check warnings | **0** |
 | `php -l` on every file | clean |
-| Runs on current WordPress | verified on 7.0.4 / PHP 8.3.33 |
+| Runs on current WordPress | verified on 7.1 / PHP 8.3 |
+| Upgrade from Enhanced Media Library 2.9.4 | settings, taxonomies, MIME types and every term assignment carried over; 18 checks |
+| Runs beside the 18 most common plugins | each alone and fourteen together; see [compatibility.md](compatibility.md) |
 | `debug.log` clean after exercising every screen | yes |
 | GPLv2 or later, attribution to wpUXsolutions | header, readme, admin footer |
 | Unique prefix on functions, classes, options, handles, AJAX actions | `vergeml_` / `vergeml-` |
@@ -33,6 +35,28 @@ readme.txt  ->  Contributors: <your-wordpress-org-username>
 ```
 
 That is the only thing between this and a submission.
+
+A new WordPress.org account can sit in manual review before the login works.
+That review is separate from the plugin review queue, which only starts once a
+submission exists. Neither is a signal about the plugin.
+
+## Running Plugin Check without Docker
+
+Plugin Check must be run against the **built archive**, not the working
+directory. Checking the repo reports errors for `.git`, the Playground zip and
+the test folder -- none of which ship -- and those false positives will bury a
+real finding.
+
+    git archive --format=zip --prefix=vergelabs-media-library/ -o /tmp/release.zip HEAD
+    # extract it, then mount the extracted folder:
+
+    npx @wp-playground/cli server --port=9403 --php=8.3 --wp=latest --login       --mount-dir "<extracted>/vergelabs-media-library" "/wordpress/wp-content/plugins/vergelabs-media-library"       --mount-dir "<plugin-check>" "/wordpress/wp-content/plugins/plugin-check"
+
+Then Tools -> Plugin Check. Tick **every** category: the form defaults to
+"Plugin Repo" alone, which skips Security, Performance and Accessibility.
+
+Last run, 2.10.0, all five categories, errors and warnings: *Checks complete. No
+errors found.*
 
 ## When you submit
 

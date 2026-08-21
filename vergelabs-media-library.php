@@ -1,13 +1,13 @@
 <?php
 /*
 Plugin Name: VergeLabs Media Library
-Plugin URI: https://github.com/vergelabsnathan/vergelabs-media-library
+Plugin URI: https://vergelabsmedia.com
 Description: Categories, tags and custom taxonomies for the media library, MIME type management, and configurable media grid filters.
 Version: 2.10.0
 Requires at least: 6.5
 Requires PHP: 7.4
 Author: VergeLabs
-Author URI: https://github.com/vergelabsnathan
+Author URI: https://vergelabs.nl
 Text Domain: vergelabs-media-library
 Domain Path: /languages
 License: GPLv2 or later

@@ -3,6 +3,55 @@
 Tested 2026-08-20 against WordPress (wp-env latest), PHP 8.3, `WP_DEBUG` and
 `WP_DEBUG_LOG` on. Reproduce with `tests/compat/matrix.sh`.
 
+## Upgrading from Enhanced Media Library
+
+The path every existing install takes, and the one where breakage costs most --
+a library of thousands of files and hundreds of terms. A fresh-install test
+cannot cover it, so it has its own suite: `tests/compat/upgrade.js`.
+
+Enhanced Media Library 2.9.4 is installed and activated, its settings are moved
+off their defaults through its own option shapes, terms are created and files
+filed under them; then EML is deactivated and this plugin activated. Eighteen
+checks pass:
+
+- every value EML held is present and unchanged afterwards -- library options,
+  taxonomy definitions, taxonomy options, custom MIME types
+- EML's own `wpuxss_eml_*` options are left untouched, so rolling back still
+  finds its settings
+- every term assignment on every file survives
+- both taxonomies are still registered against attachments
+- the site survives **both plugins active at once** -- the careless upgrade,
+  where someone installs this before deactivating EML. Media library and
+  settings screens both return 200 with no fatal.
+
+Two notes on reading that result. The migrated options are a *superset* of
+EML's, not identical: activation merges in this plugin's own defaults, including
+settings EML never had. The test asserts nothing is lost or altered rather than
+asserting equality, because equality would fail on a correct migration. And the
+settings are deliberately moved off their defaults first -- a setting that
+already equals the default cannot show whether it was carried over or merely
+re-created.
+
+### Running it without Docker
+
+This suite runs on WordPress Playground, which is real WordPress on PHP-wasm in
+Node -- no Docker, no MySQL, boots in seconds:
+
+    npx @wp-playground/cli server --port=9400 --php=8.3 --wp=latest --login \
+      --define-bool WP_DEBUG true --define-bool WP_DEBUG_DISPLAY false \
+      --define VGML_TEST_KEY "s3cr3t" \
+      --mount-dir "<repo>" "/wordpress/wp-content/plugins/vergelabs-media-library" \
+      --mount-dir "<eml-2.9.4>" "/wordpress/wp-content/plugins/enhanced-media-library" \
+      --mount-dir "<dir holding upgrade-helper.php>" "/wordpress/wp-content/mu-plugins"
+
+    node tests/compat/upgrade.js
+
+Under Git Bash, set `MSYS_NO_PATHCONV=1` first or the `/wordpress/...` mount
+targets are rewritten into Windows paths and every mount fails.
+
+GD is not present in the Playground build, so the fixtures write a literal PNG
+rather than drawing one.
+
 ## What is actually checked
 
 Nineteen assertions per plugin, aimed at the surfaces this plugin touches,

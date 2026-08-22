@@ -32,7 +32,16 @@ if ( ! defined( 'ABSPATH' ) )
 
 
 
-if ( ! defined('VERGEML_VERSION') ) define( 'VERGEML_VERSION', '2.10.0' );
+if ( ! defined('VERGEML_VERSION') ) define( 'VERGEML_VERSION', '2.10.1' );
+if ( ! defined('VERGEML_FILE') )    define( 'VERGEML_FILE', __FILE__ );
+
+
+/*
+ *  Loaded before anything else, so the handler is watching while the code it
+ *  guards is running. See core/watchdog.php for what it does and does not do.
+ */
+require_once plugin_dir_path( __FILE__ ) . 'core/watchdog.php';
+vergeml_watchdog_boot();
 
 
 
@@ -1058,21 +1067,30 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
      *  Free functionality
      */
 
-    include_once( 'core/mime-types.php' );
-    include_once( 'core/taxonomies.php' );
-    include_once( 'core/media-templates.php' );
-    include_once( 'core/compatibility.php' );
-    include_once( 'core/search.php' );
-    include_once( 'core/auto-assign.php' );
-    include_once( 'core/bulk-terms.php' );
-    include_once( 'core/system-report.php' );
+    /*
+     *  Safe mode stops here. Everything below this line is the plugin's actual
+     *  behaviour, and after two fatal errors in an hour none of it loads --
+     *  the site comes back, the plugin stays active, and the notice in
+     *  core/watchdog.php explains why.
+     */
+    if ( ! vergeml_safe_mode() ) {
 
-    if ( vergeml_enhance_media_shortcodes() ) {
-        include_once( 'core/medialist.php' );
-    }
+        include_once( 'core/mime-types.php' );
+        include_once( 'core/taxonomies.php' );
+        include_once( 'core/media-templates.php' );
+        include_once( 'core/compatibility.php' );
+        include_once( 'core/search.php' );
+        include_once( 'core/auto-assign.php' );
+        include_once( 'core/bulk-terms.php' );
+        include_once( 'core/system-report.php' );
 
-    if ( is_admin() ) {
-        include_once( 'core/options-pages.php' );
+        if ( vergeml_enhance_media_shortcodes() ) {
+            include_once( 'core/medialist.php' );
+        }
+
+        if ( is_admin() ) {
+            include_once( 'core/options-pages.php' );
+        }
     }
 
 }

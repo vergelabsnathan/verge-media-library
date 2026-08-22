@@ -4,7 +4,7 @@ Tags: media library, media folders, media tags, media categories, mime types
 Requires at least: 6.5
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.10.0
+Stable tag: 2.10.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -177,6 +177,12 @@ Not very. It is Enhanced Media Library 2.9.4 with the WordPress 7 toolbar layout
 
 No. The original polled its author's server twice a day for admin notices and printed whatever came back into your dashboard. That has been removed. This plugin makes no outbound requests of any kind.
 
+= What happens if the plugin crashes my site? =
+
+It tries to get out of your way. After two fatal errors in its own code within an hour it puts itself into safe mode: its features stop loading, the site comes back, and a notice in the dashboard tells you what happened and offers to switch them back on. That is there so a white screen does not mean an FTP client and a renamed folder.
+
+It only counts errors in its own files, so it will never deactivate itself because a different plugin crashed.
+
 = Where do I report a problem? =
 
 On the [issue tracker](https://github.com/vergelabsnathan/vergelabs-media-library/issues).
@@ -200,6 +206,14 @@ On the [issue tracker](https://github.com/vergelabsnathan/vergelabs-media-librar
 
 
 ## Changelog ##
+
+### 2.10.1 ###
+*Recovering from a white screen without FTP*
+
+= Added =
+* **The plugin now watches itself for fatal errors.** If its own code causes a fatal error twice within an hour, it stops loading its features so the site comes back instead of showing a white screen. It stays active, and a notice in the dashboard shows the error, the file and the line, with a button to switch the features back on once the cause is dealt with.
+* It only ever counts crashes in its own files. A fatal error caused by another plugin is left alone — this will never deactivate anything on somebody else's behalf.
+* Switch it off with `define( 'VERGEML_NO_WATCHDOG', true );` in wp-config.php, or force safe mode on with `define( 'VERGEML_SAFE_MODE', true );`.
 
 ### 2.10.0 ###
 *The three paid features, rebuilt and free*

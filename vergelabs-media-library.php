@@ -1065,6 +1065,7 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
     include_once( 'core/search.php' );
     include_once( 'core/auto-assign.php' );
     include_once( 'core/bulk-terms.php' );
+    include_once( 'core/system-report.php' );
 
     if ( vergeml_enhance_media_shortcodes() ) {
         include_once( 'core/medialist.php' );

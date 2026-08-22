@@ -1021,15 +1021,20 @@ if ( ! function_exists( 'vergeml_get_slug' ) ) {
             return $plugin_meta;
         }
 
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/documents/enhanced-media-library" target="_blank">' . __( 'Docs', 'vergelabs-media-library' ) . '</a>';
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/support" target="_blank">' . __( 'Support', 'vergelabs-media-library' ) . '</a>';
+        /*
+         *  These pointed at the original author's site: documentation, a
+         *  support desk that does not answer for this fork, an upsell to their
+         *  paid version, and a beta of their 3.0. None of them help somebody
+         *  running this plugin, and the upsell sent our own users off to buy
+         *  someone else's product.
+         *
+         *  Attribution stays -- in the plugin header, the readme, and the
+         *  settings footer, where it belongs. A link labelled "Support" has to
+         *  lead somewhere that actually gives support.
+         */
 
-        if ( ! defined( 'EML_IS_PRO' ) ) {
-
-            $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-pro" class="eml-pro" target="_blank">' . __( 'Go PRO', 'vergelabs-media-library' ) . '</a>';
-        }
-
-        $plugin_meta[] = '<a href="https://wpuxsolutions.com/plugins/enhanced-media-library-3-0" class="eml-pro" target="_blank">' . __( '3.0 Beta', 'vergelabs-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="' . esc_url( 'https://vergelabsmedia.com' ) . '" target="_blank" rel="noopener">' . esc_html__( 'Docs', 'vergelabs-media-library' ) . '</a>';
+        $plugin_meta[] = '<a href="' . esc_url( 'https://github.com/vergelabsnathan/vergelabs-media-library/issues' ) . '" target="_blank" rel="noopener">' . esc_html__( 'Support', 'vergelabs-media-library' ) . '</a>';
 
         return $plugin_meta;
     }
